@@ -1,0 +1,12 @@
+# Normalise line endings regardless of how each contributor's git is configured.
+* text=auto eol=lf
+
+# The wrapper script is run by sh. With CRLF endings the shebang breaks and Linux and macOS
+# report "bad interpreter", which reads like a broken JDK rather than a line-ending problem.
+gradlew text eol=lf
+gradlew.bat text eol=crlf
+
+# The resource pack's art and the packaged zip must never be line-ending converted.
+*.jar binary
+*.png binary
+*.zip binary

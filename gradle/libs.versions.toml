@@ -13,13 +13,14 @@ paper = "1.21.3-R0.1-SNAPSHOT"
 paper-test = "1.21.11-R0.1-SNAPSHOT"
 mythic = "5.13.0"
 # ItemBridge: our own item-identity layer across MythicMobs, Crucible, ItemsAdder, Nexo,
-# Oraxen and CraftEngine. Built in the sibling checkout when it is there (see
-# settings.gradle.kts), otherwise resolved from JitPack.
+# Oraxen and CraftEngine. Built from the sibling checkout when it is there (see
+# settings.gradle.kts), otherwise resolved from JitPack -- so this version is a GIT TAG in
+# the LK-ItemBridge repository, which is what JitPack builds and serves.
 #
 # It replaced Wuason's Adapter, which does the same job for twelve plugins but is
 # GPL-3.0: shading it would have forced this whole plugin to be GPL-3.0 with its source
 # published, which is not the licence chosen for it.
-itembridge = "1.0.0"
+itembridge = "v1.0.0"
 # Bytecode relocation. Bukkit's legacy class loaders share classes between plugins, so two
 # plugins shipping the same library under its own package would collide.
 shadow = "9.6.1"
@@ -35,7 +36,7 @@ mockbukkit = "4.108.0"
 paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
 paper-api-test = { module = "io.papermc.paper:paper-api", version.ref = "paper-test" }
 mythic-dist = { module = "io.lumine:Mythic-Dist", version.ref = "mythic" }
-itembridge = { module = "dev.lk:itembridge", version.ref = "itembridge" }
+itembridge = { module = "com.github.EliptikWu:LK-ItemBridge", version.ref = "itembridge" }
 vault-api = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
 vault-unlocked-api = { module = "net.milkbowl.vault:VaultUnlockedAPI", version.ref = "vault-unlocked" }
 placeholderapi = { module = "me.clip:placeholderapi", version.ref = "placeholderapi" }

@@ -1,0 +1,99 @@
+# ============================================================================
+#  LKGardenShop - crop definitions
+# ============================================================================
+#  The plugin does NOT read the 180 drop types one by one. It takes the crops
+#  below and expands them across every variant and mutation state:
+#
+#      6 crops x 3 variants x 10 mutation states = 180 types
+#
+#  The mutation states are the 8 combinations of the three weather mutations
+#  (Ice, Rain, Lightning -- the pack ships all 8) plus Nether and End, which
+#  only ever appear on their own.
+#
+#  This is why it derives names instead of parsing them: the suffixes nest
+#  (IceRainLightning contains IceRain contains Ice), so a pattern match would
+#  cheerfully identify the wrong one and mis-price the item. Building the names
+#  makes that whole class of bug impossible.
+#
+#  Run /gs info after editing. It lists any type this file produces that does
+#  not actually exist in the Mythic pack.
+#
+#  ---------------------------------------------------------------------------
+#  Crops from a DIFFERENT item plugin (optional)
+#  ---------------------------------------------------------------------------
+#  The plugin bundles Wuason's Adapter, which gives every custom item an id of
+#  the form 'plugin:id' across ItemsAdder, Nexo, Oraxen, CraftEngine, MMOItems
+#  and more. Any crop below can list ids from those plugins under 'extra-ids'
+#  and they will sell as that crop's PLAIN drop:
+#
+#      extra-ids:
+#        - 'ia:mygarden:tomato'
+#        - 'nx:tomato_harvest'
+#
+#  You do NOT need this for the Mythic pack. Mythic and Crucible ids are matched
+#  automatically, because the part after the prefix is the Mythic type name.
+#
+#  Plain drop means NORMAL variant, no mutations. An item from another plugin
+#  carries no variant or mutation information, and inventing some would price it
+#  as something it is not.
+# ============================================================================
+
+# Placeholders: {crop} {variant} {mutation}. Change this only if you rename the
+# items in growGardenItems.yml.
+type-pattern: 'growGarden{crop}{variant}Drop{mutation}'
+
+crops:
+
+  odre:
+    # Careful: Odre's fragment in the pack is "NC", not "Odre". The plugin cannot
+    # guess that, which is why every crop states its token explicitly.
+    mythic-token: NC
+    display: '&fOdre'
+    # Money a reference-weight, unmutated, NORMAL crop is worth before any band,
+    # variant or mutation multiplier applies.
+    base-value: 18.0
+    # The weight the price curve pivots around. Set to the midpoint of the plain
+    # drop's range: every crop in the pack tops out near 8x this figure, which is
+    # what lets one shared band ladder in pricing.yml fit all six.
+    base-weight: 0.475
+    # Range of the plain unmutated drop. Used as the fallback roll range for any
+    # type missing from weights.yml.
+    weight-range: { min: 0.30, max: 0.65 }
+
+  chilli:
+    mythic-token: Chilli
+    display: '&cChilli'
+    base-value: 12.0
+    base-weight: 0.165
+    weight-range: { min: 0.08, max: 0.25 }
+
+  blue_beet:
+    mythic-token: BlueBeet
+    display: '&9Blue Beet'
+    base-value: 22.0
+    base-weight: 0.350
+    weight-range: { min: 0.20, max: 0.50 }
+
+  ice_cotton:
+    mythic-token: IceCotton
+    display: '&bIce Cotton'
+    # The lightest crop in the pack (0.05kg plain, 0.80kg at Rainbow + mutations),
+    # so its base value is the lowest too.
+    base-value: 9.0
+    base-weight: 0.100
+    weight-range: { min: 0.05, max: 0.15 }
+
+  mandragora:
+    mythic-token: Mandragora
+    display: '&aMandragora'
+    # The heaviest: up to 5.50kg. Priced highest per item to match.
+    base-value: 65.0
+    base-weight: 0.650
+    weight-range: { min: 0.40, max: 0.90 }
+
+  carrot_cross:
+    mythic-token: CarrotCross
+    display: '&6Carrot Cross'
+    base-value: 15.0
+    base-weight: 0.235
+    weight-range: { min: 0.12, max: 0.35 }

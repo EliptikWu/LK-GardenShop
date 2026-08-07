@@ -1,0 +1,189 @@
+# ============================================================================
+#  LKGardenShop - general settings
+# ============================================================================
+#  Prices live in pricing.yml, crops in crops.yml, weight ranges in weights.yml
+#  and wording in messages.yml. Everything in those four reloads with:
+#
+#      /gs reload
+#
+#  A reload is all-or-nothing: if any file has an error, the previous settings
+#  stay live and the errors are listed back to you. You cannot half-break the shop.
+# ============================================================================
+
+# Language for every player-facing message.
+#
+# Translations ship inside the jar under lang/messages_<code>.yml, so there is no
+# messages.yml in this folder to edit -- that is text, not configuration. Bundled:
+# 'es' and 'en'.
+#
+# To change the wording or add a language, drop your own file at
+# plugins/LKGardenShop/lang/messages_<code>.yml and it wins over the bundled one.
+# Any code works that way, not only the two shipped. A key missing from a
+# translation falls back to English rather than showing the raw key name.
+language: es
+
+economy:
+  # AUTO           VaultUnlocked if installed, else classic Vault, else no payouts
+  # VAULT          require classic Vault
+  # VAULT_UNLOCKED require VaultUnlocked (Vault2)
+  # NONE           never pay out. /gs value and /gs prices still work, which is handy
+  #                while tuning prices on a test server
+  #
+  # Vault is the bridge nearly every economy plugin registers with, so AUTO covers
+  # EssentialsX, CMI, CoinsEngine, ExcellentEconomy and most of the rest without any
+  # further configuration.
+  #
+  # VaultUnlocked is preferred when present because it carries money as BigDecimal and
+  # supports named currencies, where classic Vault is double-only and single-currency --
+  # the same economy plugins sit behind either one. Run /gs info to see what was picked.
+  provider: AUTO
+
+  # Which currency to pay in. Leave blank for the economy plugin's default.
+  #
+  # Only VaultUnlocked can honour this; classic Vault has no concept of multiple
+  # currencies, so a value here is reported as ignored in the console rather than
+  # silently dropped. Useful if the garden should pay in its own currency while the
+  # rest of the server trades in the main one.
+  currency: ''
+
+items:
+  # Roll and store a harvest's weight the moment MythicMobs generates it.
+  #
+  # Leave this on. With it off, weights are assigned the first time an item is
+  # appraised or sold instead, which still works but means a freshly harvested
+  # crop shows the pack's own lore until someone looks at it.
+  stamp-on-generate: true
+
+  # Replace the pack's "Weight:" lore line with the stored weight, at 2 decimals.
+  #
+  # This is not cosmetic. MythicMobs does not zero-pad <random.AAtoBB>, so the
+  # pack's own line renders "1.<random.00to30>" as anything from 1.0kg to 1.30kg
+  # -- a roll of 7 shows as "1.7kg" where 1.07kg was meant. The plugin owns the
+  # real weight; this makes the lore agree with it.
+  rewrite-lore: true
+
+  # Recover a weight from the lore for crops harvested before this plugin was
+  # installed. The value is clamped into the range the drop type is supposed to
+  # roll within, so a legacy item ends up slightly over-valued at worst.
+  #
+  # Turn this off and such items get a freshly rolled weight instead.
+  legacy-lore-fallback: true
+
+  # Must contain exactly one %s, where the weight goes. Legacy & colour codes.
+  weight-lore-format: '&f&lWeight: &r%skg'
+
+  # Substring that identifies the lore line to replace, matched case-insensitively
+  # with colour codes stripped. Change this only if you rename the line in the pack.
+  weight-lore-marker: 'weight:'
+
+selling:
+  # Seconds a player must wait between sales. 0 disables the cooldown.
+  cooldown-seconds: 0
+
+  # Ceiling on how many items one /gs sell all consumes. 2304 is a full 36-slot
+  # inventory of 64-stacks, so the default never gets in the way; lower it if you
+  # want bulk selling to take several passes.
+  max-items-per-bulk-sale: 2304
+
+  # Honour the favorite flag during bulk sales.
+  #
+  # Turning this off removes the only protection players have against wiping a
+  # record harvest with one command. Think twice.
+  skip-favorites: true
+
+# ---------------------------------------------------------------------------
+#  Resource pack
+# ---------------------------------------------------------------------------
+#  The shop menu's backdrop is a texture that lives in a resource pack. The pack
+#  is COSMETIC: the plugin never needs it to work, and everything below is about
+#  getting it to your players, not about whether the shop functions.
+#
+#  Already running ItemsAdder, Nexo or Oraxen? Nothing here fights them. Our pack
+#  is ADDED to the stack the client already has -- since 1.20.3 a player can hold
+#  several packs at once -- so their textures and ours coexist and neither is
+#  evicted. If you would rather have their pack merger absorb our art into the one
+#  pack you already ship, feed it the plugin's 'resourcepack' folder, then set
+#  'mode: none' below and leave 'installed: true'.
+# ---------------------------------------------------------------------------
+resource-pack:
+  # Do your players have the pack -- served by THIS plugin, by ItemsAdder/Nexo, or
+  # installed by hand?
+  #
+  # This is the ONE switch for "my server ships no pack". Set it to false and every
+  # piece of pack art turns off at once, so nothing renders as an empty box: the
+  # menus fall back to a plain chest with a text title and vanilla item icons.
+  # Leave it true if the pack reaches your players by any means.
+  installed: true
+
+  # Send the pack automatically when a player joins.
+  enabled: true
+
+  # Leave EMPTY and the plugin picks for you. Set it only to override.
+  #
+  # 'external-url'       you host the .zip and fill in url + sha1 below. Needs no
+  #                      open port. Picked automatically when 'url' is set.
+  # 'bundled-self-host'  the plugin serves the pack itself over a small built-in
+  #                      HTTP server. Nothing to upload, but it needs a TCP port
+  #                      that is OPEN TO THE INTERNET, separate from the Minecraft
+  #                      port -- on a managed host you have to request an extra
+  #                      allocation for it. Picked when 'url' is empty.
+  # 'none'               send nothing.
+  mode: ''
+
+  # --- Used when mode is external-url ----------------------------------------
+  #
+  # A GitHub release asset is the cheapest host there is: free, on a CDN, nothing to
+  # keep running, and the file never moves once the release is published. Run
+  # './gradlew packZip', attach the pack.zip to a release, and paste the asset's
+  # download URL here -- the one shaped like
+  #
+  #   https://github.com/<user>/<repo>/releases/download/<tag>/pack.zip
+  #
+  # It must be a PUBLIC repository. Release assets on a private one need an access
+  # token, and a Minecraft client does not send one, so every player would get a 404.
+  url: ''
+
+  # 40 hex characters. Run './gradlew packZip' and it prints the right one.
+  #
+  # Get this wrong and the client downloads the pack, sees the bytes disagree, and
+  # rejects it -- which looks to the player like the download simply failed. It is
+  # the single most common cause of "the pack won't load".
+  sha1: ''
+
+  # --- Used when mode is bundled-self-host ----------------------------------
+  self-host:
+    # Must be free AND reachable from the internet. Not the Minecraft port.
+    port: 8123
+
+    # Hostname or IP clients should download from. Leave blank to use the address
+    # the server bound to, which is wrong behind NAT or in a container often
+    # enough that it is worth setting explicitly.
+    public-host: ''
+
+  # Kick players who decline the download.
+  required: false
+
+  # Shown in the client's accept dialog. MiniMessage. Blank for the vanilla text.
+  prompt: '<green>Install the pack to see the shop art'
+
+console:
+  # Print the startup banner and its checklist.
+  #
+  # The checklist is the useful part: it says in one block whether the economy is
+  # hooked, whether MythicMobs was found, how many drop types loaded and whether
+  # anything needs looking at. With this off you get a single summary line instead.
+  #
+  # Read once at startup, so changing it needs a restart rather than a reload.
+  banner: true
+
+stats:
+  # Track lifetime earnings, items sold and heaviest harvest per crop, for the
+  # %gardenshop_total_earned% and %gardenshop_record_<crop>% placeholders.
+  enabled: true
+
+  # How often statistics are written to stats.yml, in seconds. Writes happen off
+  # the main thread, so a crash can lose up to this much history -- nothing that
+  # affects balances or items.
+  #
+  # This block is read once at startup: changes here need a restart, not a reload.
+  flush-interval-seconds: 60

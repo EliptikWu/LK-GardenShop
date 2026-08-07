@@ -1,0 +1,366 @@
+# ============================================================================
+#  LKGardenShop - textos (espanol)
+# ============================================================================
+#  Formato MiniMessage: <green>, <gradient:#a>, <bold>, <hover:show_text:'...'>.
+#  Referencia: https://docs.advntr.dev/minimessage/format.html
+#
+#  Este archivo NO se extrae a la carpeta del plugin: es texto, no configuracion.
+#  Se elige con `language: es` en config.yml. Si dejas un `messages_es.yml` en la
+#  carpeta del plugin, ese gana sobre este.
+#
+#  Usa <prefix> donde quieras el prefijo; no se anade solo, asi que un aviso de
+#  una linea y un desglose de varias pueden verse distinto.
+#
+#  Pon cualquier mensaje a '' para silenciarlo. Los marcadores <entre angulos>
+#  los rellena el plugin; uno desconocido se imprime tal cual.
+#
+#  Una clave que falte cae al ingles, asi que una version nueva nunca deja al
+#  jugador mirando el nombre de una clave.
+# ============================================================================
+
+prefix: '<dark_green>[<green>Garden<white>Shop<dark_green>] '
+
+# ---------------------------------------------------------------------------
+#  Banner de arranque, impreso una vez en consola.
+#
+#  El color es el adorno; la checklist es lo importante. Este plugin puede
+#  arrancar a medio conectar -- sin economia, sin MythicMobs, con un archivo de
+#  pesos que no cargo -- y cada caso aparece si no como un warning enterrado
+#  entre la salida de otros cien plugins.
+#
+#  Se apaga con console.banner: false en config.yml y solo queda el resumen de
+#  una linea. Los degradados caen a texto plano en terminales sin color, asi que
+#  no hay nada que configurar para eso.
+# ---------------------------------------------------------------------------
+console:
+  header:
+    - ''
+    - '  <gradient:#1b5e20:#76ff03>▄▄▄  LK GardenShop  ▄▄▄</gradient>'
+    - '  <dark_gray>v<version> <dark_gray>· <gray><server>'
+    - ''
+
+  # Una fila por subsistema comprobado. <label> ya viene alineado.
+  entry: '  <status> <gray><label> <white><detail>'
+
+  status:
+    ok: '<green>✔'
+    warn: '<yellow>▲'
+    # Se llama 'disabled' y no 'off': YAML 1.1 lee un off/on/yes/no suelto como
+    # booleano, asi que una clave 'off:' se vuelve false y la busqueda falla.
+    disabled: '<red>✖'
+
+  footer:
+    - ''
+    - '  <dark_gray>Listo en <gray><ms>ms<dark_gray> · <gray><problems> <dark_gray>cosa(s) que revisar · <gray>/gs info'
+    - ''
+
+  # Se imprime en lugar del banner completo cuando console.banner es false.
+  summary: '<prefix><green>Activado v<version> en <white><ms>ms <gray>(<white><problems> <gray>cosa(s) que revisar, mira /gs info)'
+
+no-permission: '<prefix><red>No tienes permiso para eso.'
+players-only: '<prefix><red>Eso solo puede usarlo un jugador.'
+unknown-subcommand: '<prefix><red>Subcomando desconocido <white><input><red>. Prueba <white>/gs help<red>.'
+
+help:
+  - '<dark_green><strikethrough>                                        '
+  - '<green><bold>GardenShop'
+  - '<gray>Vende tus cosechas. Las mas pesadas valen mas.'
+  - ''
+  - '<green>/gs <dark_gray>- <gray>abre el menu de la tienda'
+  - '<green>/gs value <dark_gray>- <gray>cuanto vale la cosecha que llevas en la mano?'
+  - '<green>/gs sell hand <dark_gray>- <gray>vende el stack que tienes en la mano'
+  - '<green>/gs sell all <dark_gray>- <gray>vende todas las cosechas, saltando favoritas'
+  - '<green>/gs favorite <dark_gray>- <gray>protege la cosecha en mano de <white>/gs sell all'
+  - '<dark_green><strikethrough>                                        '
+
+# Se anade a la ayuda de arriba solo a quien tenga un permiso de admin.
+help-admin:
+  - '<gold>/gs prices <dark_gray>[<gray>cultivo<dark_gray>] <dark_gray>- <gray>la hoja de precios completa'
+  - '<gold>/gs reload <dark_gray>- <gray>recarga los archivos de configuracion'
+  - '<gold>/gs info <dark_gray>- <gray>que esta cargado y que esta roto'
+  - '<gold>/gs adapter <dark_gray>- <gray>vender items de tus otros plugins de items'
+  - '<dark_green><strikethrough>                                        '
+
+# ---------------------------------------------------------------------------
+#  La hoja de calibracion. /gs prices para el resumen, /gs prices <cultivo> para
+#  todos los tipos de drop de uno.
+prices:
+  header: '<prefix><green><bold>Hoja de precios <gray>(modo <white><mode><gray>, <white><types> <gray>tipos de drop)'
+
+  # <mintype> y <maxtype> son los nombres Mythic detras de los extremos: utiles
+  # cuando un numero se ve raro y hay que saber que drop lo produjo.
+  crop: '<dark_gray>  - <crop> <dark_gray>[<gray><id><dark_gray>] <gray>tipico <gold><typical> <dark_gray>| <gray>rango <white><min> <dark_gray>-> <gold><max> <dark_gray>(<white><multiple>x<dark_gray>)'
+
+  spread: '<prefix><gray>Todo el jardin: <white><min> <dark_gray>-> <gold><max> <dark_gray>(<white><multiple>x <gray>del mas barato al mas caro)'
+
+  hint: '<gray>Usa <white>/gs prices <id-cultivo> <gray>para ver todos los tipos de drop de uno.'
+
+  crop-header: '<prefix><green><bold><crop> <gray>- <white><count> <gray>tipos de drop, base <white><base><gray>, peso de referencia <white><ref>kg'
+
+  # Una fila por tipo de drop. <spread> es cuanto vale el rango de peso por si
+  # solo dentro de ese tipo.
+  type: '<dark_gray>  <gray><variant> <dark_gray>| <aqua><mutations> <dark_gray>| <white><wmin>-<wmax>kg <dark_gray>| <band> <dark_gray>| <gold><pmin> <dark_gray>-> <gold><pmax> <dark_gray>(<white><spread>x<dark_gray>)'
+
+  unknown-crop: '<prefix><red>No hay ningun cultivo con id <white><input><red>. Conocidos: <gray><known>'
+
+# ---------------------------------------------------------------------------
+sell:
+  usage: '<prefix><red>Usa <white>/gs sell hand<red> o <white>/gs sell all<red>.'
+
+  success: '<prefix><green>Vendiste <white><items> <green>cosecha(s) en <white><stacks> <green>stack(s) por <gold><amount><green>.'
+
+  nothing: '<prefix><yellow>No llevas ninguna cosecha en la mano, y no hay nada vendible en tu inventario.'
+
+  all-favorited: '<prefix><yellow>Todas tus cosechas estan marcadas como favoritas <gray>(<white><count><gray>). Quita la marca con <white>/gs favorite<gray>.'
+
+  skipped-favorites: '<prefix><gray>Se quedaron fuera <white><count> <gray>cosecha(s) favorita(s).'
+
+  left-over-limit: '<prefix><gray>Quedaron <white><count> <gray>cosecha(s) sin vender: una venta solo puede llevarse un maximo. Vende otra vez para el resto.'
+
+  # Solo sale si un multiplicador de precio esta muy mal configurado; la consola
+  # recibe un warning al mismo tiempo.
+  capped: '<prefix><yellow>Esa venta llego al tope por venta y se pago <white><amount><yellow>. Avisa a un admin.'
+
+  economy-unavailable: '<prefix><red>Vender no esta disponible ahora mismo: <white><reason><red>.'
+
+  # En este caso el jugador conserva sus cosechas: decirlo claro, o va a asumir
+  # que los items se perdieron.
+  deposit-failed: '<prefix><red>El pago fallo, asi que tus cosechas te fueron devueltas. <gray>(<white><reason><gray>)'
+
+  inventory-changed: '<prefix><yellow>Tu inventario cambio a mitad de la venta, asi que no se vendio nada. Intenta otra vez.'
+
+  cooldown: '<prefix><yellow>Puedes vender de nuevo en <white><seconds>s<yellow>.'
+
+# ---------------------------------------------------------------------------
+value:
+  not-a-crop: '<prefix><yellow>Eso no es una cosecha vendible.'
+
+  header: '<prefix><green><bold>Tasacion'
+  identity: '<gray>  Cultivo <dark_gray>| <crop> <dark_gray>| <gray>Variante <white><variant>'
+  mutations: '<gray>  Mutaciones <dark_gray>| <aqua><mutations>'
+  weight: '<gray>  Peso <dark_gray>| <white><weight>kg <dark_gray>(<band><dark_gray>)'
+  unit: '<gray>  Cada una <dark_gray>| <gold><unit>'
+  total: '<gray>  Stack de <white><amount> <dark_gray>| <gold><bold><total>'
+
+  # El desglose de como se llego a ese precio. Ponlo a '' si prefieres que los
+  # jugadores no vean los multiplicadores.
+  factor: '<dark_gray>    - <gray><factor> <dark_gray><label> <dark_gray>=> <white><value>'
+
+  inventory: '<prefix><gray>Todo lo vendible de tu inventario: <gold><total> <gray>(<white><items> <gray>cosechas)'
+
+# ---------------------------------------------------------------------------
+favorite:
+  not-a-crop: '<prefix><yellow>Sujeta una cosecha para marcarla como favorita.'
+  added: '<prefix><green>Marcada como favorita. <gray><white>/gs sell all<gray> ya no la tocara.'
+  removed: '<prefix><yellow>Marca quitada. <gray>Esta cosecha ya puede venderse en lote.'
+
+# ---------------------------------------------------------------------------
+reload:
+  success: '<prefix><green>Recargado. <white><types> <gray>tipos de drop en <white><crops> <gray>cultivos, modo de precios <white><mode><gray>.'
+
+  # No se aplico nada: la configuracion anterior sigue viva.
+  failed: '<prefix><red>Recarga rechazada: tu configuracion anterior sigue activa. Arregla esto y prueba otra vez:'
+
+  error: '<red>  x <white><file><gray> <path> <dark_gray>- <red><message>'
+  warning: '<yellow>  ! <white><file><gray> <path> <dark_gray>- <yellow><message>'
+  more-issues: '<gray>  ... y <white><count> <gray>mas. La lista completa esta en la consola.'
+
+# ---------------------------------------------------------------------------
+#  Texto de los menus. El layout (filas, slots, materiales) vive en gui.yml.
+#
+#  Los nombres y el lore de los items NO llevan prefijo: un <prefix> en una
+#  linea de lore se veria raro. El lore se escribe como lista, una linea por
+#  entrada.
+gui:
+  # Razones que salen en un boton desactivado. Separadas para poder reusarlas.
+  reason:
+    not-a-crop: 'no llevas una cosecha en la mano'
+    nothing-to-sell: 'no hay nada vendible en tu inventario'
+
+  sell-menu:
+    title: '<dark_green>Tienda del Jardin'
+
+    held:
+      name: '<green>En tu mano'
+      lore:
+        - '<gray>Cultivo <dark_gray>| <crop>'
+        - '<gray>Variante <dark_gray>| <white><variant>'
+        - '<gray>Mutaciones <dark_gray>| <aqua><mutations>'
+        - '<gray>Peso <dark_gray>| <white><weight>kg <dark_gray>(<band><dark_gray>)'
+        - ''
+        - '<gray>Cada una <dark_gray>| <gold><unit>'
+        - '<gray>Stack de <white><amount> <dark_gray>| <gold><bold><total>'
+      empty-name: '<yellow>No llevas nada'
+      empty-lore:
+        - '<gray>Sujeta una cosecha para ver cuanto vale.'
+
+    sell-hand:
+      name: '<green><bold>Vender lo que llevas'
+      lore:
+        - '<gray>Paga <gold><total> <gray>por <white><amount> <gray>cosecha(s).'
+        - ''
+        - '<dark_gray>Aqui las favoritas se ignoran:'
+        - '<dark_gray>esta la elegiste tu.'
+      disabled-name: '<dark_gray>Eso no se puede vender'
+      disabled-lore:
+        - '<gray><reason>'
+
+    sell-all:
+      name: '<green><bold>Vender todo'
+      lore:
+        - '<gray>Valor <dark_gray>| <gold><total>'
+        - '<gray>Cosechas <dark_gray>| <white><items> <gray>en <white><stacks> <gray>stack(s)'
+        - ''
+        - '<dark_gray>Las favoritas se quedan intactas.'
+      empty-name: '<dark_gray>Nada que vender'
+      empty-lore:
+        - '<gray><reason>'
+
+    prices:
+      name: '<gold><bold>Libro de precios'
+      lore:
+        - '<gray>Cuanto vale cada cultivo en todo'
+        - '<gray>su rango de peso.'
+        - ''
+        - '<gray><crops> <gray>cultivos.'
+
+    stats:
+      name: '<aqua><player>'
+      lore:
+        - '<gray>Ganado <dark_gray>| <gold><earned>'
+        - '<gray>Cosechas vendidas <dark_gray>| <white><sold>'
+        - '<gray>Ventas <dark_gray>| <white><sales>'
+
+  confirm-menu:
+    title: '<dark_red>Vender todo?'
+
+    summary:
+      name: '<white><bold>Esta venta'
+      lore:
+        - '<gray>Valor <dark_gray>| <gold><total>'
+        - '<gray>Cosechas <dark_gray>| <white><items> <gray>en <white><stacks> <gray>stack(s)'
+        - ''
+        - '<gray>Favoritas que se quedan <dark_gray>| <white><favorites>'
+
+    confirm:
+      name: '<green><bold>Si, vendelas'
+      lore:
+        - '<gray>Paga <gold><total><gray>.'
+        - ''
+        - '<dark_gray>Se vuelve a tasar al hacer click,'
+        - '<dark_gray>asi que el numero de arriba es una'
+        - '<dark_gray>estimacion.'
+
+    cancel:
+      name: '<red><bold>No, volver'
+      lore:
+        - '<gray>No se vende nada.'
+
+    # Solo se envia si el inventario cambio entre abrir esta pantalla y confirmar.
+    total-changed: '<prefix><yellow>Tu inventario cambio, asi que se te pago <gold><paid> <yellow>en vez de los <white><quoted> <yellow>estimados.'
+
+  price-book:
+    title: '<gold>Libro de precios'
+    crop-title: '<gold>Precios <dark_gray>| <crop>'
+
+    crop:
+      name: '<crop>'
+      lore:
+        - '<dark_gray><id>'
+        - ''
+        - '<gray>Tipico <dark_gray>| <gold><typical>'
+        - '<gray>Rango <dark_gray>| <white><min> <dark_gray>-> <gold><max>'
+        - '<gray>El mejor vale <white><multiple>x <gray>el peor'
+        - '<gray>Peso de referencia <dark_gray>| <white><ref>kg'
+        - ''
+        - '<yellow>Click para ver todos los tipos de drop.'
+
+    type:
+      name: '<white><variant> <dark_gray>| <aqua><mutations>'
+      lore:
+        - '<gray>Peso <dark_gray>| <white><wmin>-<wmax>kg'
+        - '<gray>Banda <dark_gray>| <band>'
+        - ''
+        - '<gray>En el minimo <dark_gray>| <gold><pmin>'
+        - '<gray>En el maximo <dark_gray>| <gold><pmax>'
+        - '<gray>El peso solo vale <white><spread>x'
+        - ''
+        - '<dark_gray><type>'
+
+    back-to-shop: '<yellow>Volver a la tienda'
+    back-to-crops: '<yellow>Volver a todos los cultivos'
+    previous-page: '<yellow>Pagina <page> de <pages>'
+    next-page: '<yellow>Pagina <page> de <pages>'
+
+# ---------------------------------------------------------------------------
+info:
+  header: '<prefix><green><bold>Estado'
+  economy: '<gray>  Economia <dark_gray>| <white><provider> <dark_gray>(disponible: <white><available><dark_gray>)'
+  pricing: '<gray>  Precios <dark_gray>| <white><mode><gray>, <white><bands> <gray>bandas, interpolar <white><interpolate>'
+  registry: '<gray>  Cargado <dark_gray>| <white><types> <gray>tipos, <white><crops> <gray>cultivos, <white><weights> <gray>rangos de peso'
+  mythic: '<gray>  MythicMobs <dark_gray>| <white><available> <dark_gray>(<white><known> <dark_gray>items conocidos)'
+  pack: '<gray>  Resource pack <dark_gray>| <white><mode> <dark_gray>(<gray><detail><dark_gray>), estilo de menu <white><style><dark_gray>, <white><loaded> <dark_gray>jugador(es) lo cargaron'
+  stats: '<gray>  Stats <dark_gray>| <white><enabled> <dark_gray>(<white><players> <dark_gray>jugadores registrados)'
+  crop: '<dark_gray>    - <white><crop> <dark_gray>[<gray><id><dark_gray>/<gray><token><dark_gray>] <gray>base <white><base><gray>, ref <white><weight>kg'
+
+  # El diagnostico mas util: tipos que este plugin cotiza pero el pack de Mythic
+  # no tiene, lo que haria que esos drops no se puedan vender.
+  missing-types: '<red>  x <white><count> <red>tipo(s) no estan en el pack de Mythic, empezando por <white><first><red>. Esos drops no se pueden vender.'
+
+# ---------------------------------------------------------------------------
+#  /gs adapter -- mapear items de OTROS plugins de items a nuestros cultivos.
+#
+#  Solo hace falta si tienes cultivos que no vienen del pack de Mythic. Los
+#  items de Mythic y Crucible se identifican solos.
+# ---------------------------------------------------------------------------
+adapter:
+  header: '<prefix><green><bold>Adaptador de items'
+  status: '<gray>  <white><items> <gray>item(s) conocidos entre tus plugins, <white><bindings> <gray>mapeados en <white><file>'
+
+  usage:
+    - '<gray>  /gs adapter hand <dark_gray>- los ids del item que tienes en la mano'
+    - '<gray>  /gs adapter list [texto] <dark_gray>- busca entre todos los ids que conocen tus plugins'
+    - '<gray>  /gs adapter bind <cultivo> [id] <dark_gray>- vende el item de la mano como ese cultivo'
+    - '<gray>  /gs adapter unbind [id] <dark_gray>- deshacerlo'
+
+  unavailable: '<prefix><red>El adaptador de items no arranco, asi que no hay nada que mapear. Mira la consola.'
+
+  hand:
+    empty: '<prefix><yellow>Ten en la mano el item que quieres mapear.'
+    no-ids: '<prefix><yellow>Ningun plugin de items reconoce eso. No hay nada que mapear.'
+    header: '<prefix><green>Ese item responde a:'
+
+    # Ya se puede vender: o esta mapeado, o es un id de Mythic, que no necesita mapeo.
+    resolved: '<green>  + <white><id> <dark_gray>-> <gray>se vende como <white><crop>'
+    bindable: '<yellow>  ? <white><id> <dark_gray>-> <gray>todavia sin mapear'
+    # Nunca mapeable. Mapear un material vanilla haria vendibles todos los que existan.
+    vanilla: '<dark_gray>  - <gray><id> <dark_gray>(material vanilla, no se puede mapear)'
+
+  list:
+    header: '<prefix><green><white><count> <gray>id(s) coinciden con <white><filter><gray>:'
+    entry: '<dark_gray>  - <gray><id>'
+    more: '<dark_gray>  ... y <white><count> <dark_gray>mas. Afina con /gs adapter list <texto>'
+    empty: '<prefix><yellow>Ningun id coincide con <white><filter><yellow>.'
+
+  bind:
+    usage: '<prefix><yellow>/gs adapter bind <cultivo> [id] <gray>- ten el item en la mano, o escribe su id.'
+    unknown-crop: '<prefix><red>No existe el cultivo <white><crop><red>. Conocidos: <gray><crops>'
+    unknown-id: '<prefix><red>Ningun plugin de items conoce <white><id><red>. Comprueba como se escribe con /gs adapter list.'
+
+    # La proteccion que mas importa. Ver AdapterSources.VANILLA.
+    vanilla: '<prefix><red>Me niego a mapear <white><id><red>: es un material vanilla, asi que todos los que hubiera en el servidor pasarian a ser un cultivo.'
+
+    already: '<prefix><yellow><white><id> <yellow>ya se vende como <white><crop><yellow>. No hay nada que hacer.'
+    no-candidates: '<prefix><yellow>Ese item solo tiene ids vanilla, asi que no hay nada que mapear.'
+    ambiguous: '<prefix><yellow>Ese item tiene <white><count> <yellow>ids mapeables, elige uno: <gray>/gs adapter bind <cultivo> <id>'
+    ambiguous-entry: '<dark_gray>  - <gray><id>'
+
+    done: '<prefix><green>Mapeado <white><id> <green>a <white><crop><green>. Se vende como el drop plano de ese cultivo.'
+    replaced: '<prefix><green>Mapeado <white><id> <green>a <white><crop><gray> (antes era <previous>).'
+
+  unbind:
+    done: '<prefix><green>Desmapeado <white><id><green>. Ya no se vende como <white><crop><green>.'
+    not-bound: '<prefix><yellow><white><id> <yellow>no estaba mapeado.'
+    nothing-bound: '<prefix><yellow>No hay nada mapeado al item que tienes en la mano.'
+
+  write-failed: '<prefix><red>No se pudo escribir <white><file><red>: <gray><message>'

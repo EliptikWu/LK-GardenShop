@@ -1,0 +1,150 @@
+# ============================================================================
+#  LKGardenShop - prices
+# ============================================================================
+#  This is the file you tune. /gs reload applies it without a restart, and if you
+#  break something the previous prices stay live while the errors are listed back.
+# ============================================================================
+
+# HYBRID   base-value x weight-band x variant x mutations x global    (default)
+# BANDS    a flat amount per weight band, from flat-money below
+# FORMULA  base-value x (weight / base-weight)^exponent x variant x mutations
+#
+# HYBRID is the default because the band ladder gives you a dial per weight range
+# while variant and mutation multipliers stay independent. FORMULA reproduces Grow
+# a Garden's own curve exactly but offers no per-range control. BANDS is the most
+# literal "this weight bracket pays this much".
+mode: HYBRID
+
+# Multiplies every payout. Handy for a double-money weekend, or for pulling the
+# whole economy down without editing 40 numbers.
+global-multiplier: 1.0
+
+# Floor per item, so nothing ever sells for 0.
+min-payout: 1.0
+
+# Ceiling on a single sale. A safety valve: if a mis-typed multiplier ever makes a
+# sale worth more than this, it is capped, the player is told, and a warning goes
+# to the console. It is not meant to be hit in normal play.
+max-payout-per-sale: 10000000
+
+# Decimal places kept on the per-item price, and how to round to them.
+# HALF_UP, HALF_DOWN, HALF_EVEN, UP, DOWN, CEILING, FLOOR
+money-scale: 2
+rounding: HALF_UP
+
+
+# ---------------------------------------------------------------------------
+#  The weight ladder -- how much a given weight range is worth
+# ---------------------------------------------------------------------------
+weight-bands:
+
+  # RATIO     bounds are weight / base-weight. One ladder fits every crop, because
+  #           each one tops out near 8x its base weight -- Ice Cotton at 0.80kg and
+  #           Mandragora at 5.50kg both land in the same top band.
+  # ABSOLUTE  bounds are literal kilograms. Only sensible with per-crop-bands,
+  #           since 0.5kg is huge for Ice Cotton and tiny for Mandragora.
+  mode: RATIO
+
+  # Blend smoothly between rungs instead of stepping.
+  #
+  # With this off, a band's multiplier applies flatly, so at a 1.30 boundary a
+  # 1.31kg crop is worth more than twice a 1.30kg one and everything from 1.31 to
+  # 2.20 is worth the same. Players find those edges and farm them.
+  #
+  # With it on, a band's multiplier is what you earn at its UPPER edge and weights
+  # in between are interpolated from the rung below. The curve is continuous and
+  # never decreasing, so heavier is always at least as good.
+  interpolate: true
+
+  # Listed in ascending order; max is inclusive.
+  #
+  # The top band stops at 9.0 rather than some huge number on purpose: with
+  # interpolation on, a band reaching to 999 would leave every achievable weight
+  # pinned near the previous rung, because nothing gets near the far edge. 9.0 sits
+  # just above the heaviest reachable ratio in the pack (Mandragora, 8.46).
+  bands:
+    - { id: runt,    max: 0.85, multiplier: 0.6,  label: '&7Runt' }
+    - { id: normal,  max: 1.30, multiplier: 1.0,  label: '&fNormal' }
+    - { id: big,     max: 2.20, multiplier: 2.2,  label: '&aBig' }
+    - { id: huge,    max: 4.00, multiplier: 6.0,  label: '&bHuge' }
+    - { id: titanic, max: 6.50, multiplier: 14.0, label: '&dTitanic' }
+    - { id: mythic,  max: 9.00, multiplier: 30.0, label: '&6&lMythic' }
+
+
+# ---------------------------------------------------------------------------
+#  Variant and mutation multipliers (HYBRID and FORMULA only)
+# ---------------------------------------------------------------------------
+
+# Grow a Garden uses x10 for Gold and x25 for Rainbow, but it applies those to a
+# weight that does not itself change. Here the pack already makes Gold drops roll
+# ~2.7x heavier and Rainbow ~5.4x heavier, so they climb into richer bands on
+# their own. Multiplying by another x25 on top would double-count the same growth.
+# These gentler figures keep the chase worthwhile without the payout exploding.
+variants:
+  NORMAL: 1.0
+  GOLD: 2.5
+  RAINBOW: 5.0
+
+mutations:
+  RAIN: 1.8
+  ICE: 2.4
+  LIGHTNING: 3.0
+  NETHER: 4.0
+  END: 6.0
+
+# ADDITIVE        1 + sum(m - 1). With Ice+Rain+Lightning: 1 + 1.4 + 0.8 + 2.0 = 5.2
+# MULTIPLICATIVE  product of all. The same three: 2.4 x 1.8 x 3.0 = 12.96
+#
+# Grow a Garden never stacks mutations, so it has no answer here. This pack does
+# (growGardenNCDropIceRainLightning carries three), which makes this a balance
+# choice. ADDITIVE keeps triple-mutated crops valuable without being absurd.
+mutation-stacking: ADDITIVE
+
+# Exponent on the weight ratio in FORMULA mode. 2.0 is what Grow a Garden uses:
+# twice the weight is four times the price, three times is nine.
+weight-exponent: 2.0
+
+
+# ---------------------------------------------------------------------------
+#  BANDS mode payouts
+# ---------------------------------------------------------------------------
+#  Only read when mode is BANDS. Variant and mutation multipliers are ignored in
+#  that mode -- Gold and Rainbow drops already roll heavier and so land in richer
+#  bands, and multiplying again would count the same bonus twice.
+#
+#  'default' applies to every crop; add a crop id alongside it to override, e.g.
+#
+#    flat-money:
+#      default:    { runt: 8, normal: 25, ... }
+#      mandragora: { runt: 30, normal: 95, ... }
+#
+#  These starting figures are crop-agnostic and will feel wrong for the extremes
+#  (Ice Cotton and Mandragora). If you switch to BANDS, expect to add per-crop
+#  tables. /gs reload warns about any band left without an amount.
+# ---------------------------------------------------------------------------
+flat-money:
+  default:
+    runt: 8
+    normal: 25
+    big: 90
+    huge: 320
+    titanic: 1100
+    mythic: 4000
+
+
+# ---------------------------------------------------------------------------
+#  Per-crop ladder overrides (optional)
+# ---------------------------------------------------------------------------
+#  Same shape as weight-bands above. Rarely needed with RATIO mode; essential if
+#  you switch to ABSOLUTE. A crop id here that is not in crops.yml is an error, so
+#  a typo cannot silently do nothing.
+#
+#  per-crop-bands:
+#    ice_cotton:
+#      mode: ABSOLUTE
+#      interpolate: true
+#      bands:
+#        - { id: runt,   max: 0.10, multiplier: 0.6, label: '&7Runt' }
+#        - { id: normal, max: 0.20, multiplier: 1.0, label: '&fNormal' }
+# ---------------------------------------------------------------------------
+per-crop-bands: {}

@@ -1,0 +1,54 @@
+{
+  "comment": [
+    "Menu art drawn as glyphs in the inventory TITLE. A title glyph renders behind the items and",
+    "in front of the container background, which is exactly the layer a menu backdrop needs.",
+    "",
+    "U+E901  shop_gui.png. Canvas 256x256; the art occupies x 25..230, y 0..221 (206x222).",
+    "        222 is the exact height of a 6-row chest window, so at height:256 (scale 1:1) the art",
+    "        covers the whole window. ascent:13 puts its top row at the window's top edge: the title",
+    "        baseline sits at y=13 (drawn at y=6, vanilla ascent 7), and a glyph's top row lands at",
+    "        baseline - ascent.",
+    "",
+    "U+E9B0..U+E9B7  positive advances  +1 +2 +4 +8 +16 +32 +64 +128",
+    "U+E9B8..U+E9BF  negative advances  -1 -2 -4 -8 -16 -32 -64 -128",
+    "        Binary building blocks: any pixel offset is a short combination of these. The plugin",
+    "        composes them in MenuBackground so the X position is tunable from config.yml without",
+    "        touching this file.",
+    "",
+    "To move the art vertically or rescale it, change ascent/height below, then run",
+    "  ./gradlew packZip",
+    "which rebuilds the zip and recomputes its SHA-1. Horizontal moves need no rebuild."
+  ],
+  "providers": [
+    {
+      "type": "space",
+      "advances": {
+        "\ue9b0": 1,
+        "\ue9b1": 2,
+        "\ue9b2": 4,
+        "\ue9b3": 8,
+        "\ue9b4": 16,
+        "\ue9b5": 32,
+        "\ue9b6": 64,
+        "\ue9b7": 128,
+        "\ue9b8": -1,
+        "\ue9b9": -2,
+        "\ue9ba": -4,
+        "\ue9bb": -8,
+        "\ue9bc": -16,
+        "\ue9bd": -32,
+        "\ue9be": -64,
+        "\ue9bf": -128
+      }
+    },
+    {
+      "type": "bitmap",
+      "file": "minecraft:gui/shop_gui.png",
+      "ascent": 13,
+      "height": 256,
+      "chars": [
+        "\ue901"
+      ]
+    }
+  ]
+}

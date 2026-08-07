@@ -1,0 +1,25 @@
+.gradle/
+build/
+# The wrapper jar is committed on purpose: it is what makes `./gradlew` work on a
+# machine with nothing but a JDK.
+!gradle/wrapper/gradle-wrapper.jar
+.idea/
+*.iml
+out/
+bin/
+run/
+
+# The crop pack, and the list of type names extracted from it. Kept out of a public
+# repository on purpose: the pack is the content the shop sells, not the shop.
+#
+# Nothing in the plugin reads either file at runtime -- the crops are read through
+# MythicMobs -- so a clone builds and runs without them. MythicTypeComposerTest's
+# pack-comparison assertion SKIPS when the extract is absent rather than failing, so
+# `gradlew build` stays green; regenerate it with scripts/gen-expected-types.ps1 to
+# turn that check back on.
+growGardenItems.yml
+gardenshop-core/src/test/resources/expected-drop-types.txt
+
+# Editor and tooling state, personal to whoever cloned this.
+.claude/
+.vscode/

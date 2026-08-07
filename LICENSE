@@ -1,0 +1,42 @@
+LKGardenShop
+Copyright (c) 2026 LK. All rights reserved.
+
+The source of this plugin is published so that anyone running it can read what it does
+before installing it. Published is not the same as free to take: except for the rights
+granted below, all rights are reserved.
+
+YOU MAY
+
+  - download, install and run this plugin on any server you operate, including a server
+    that charges players money, at no cost and without asking;
+  - modify your own copy for use on your own server;
+  - read, study and quote the source, including in a review or a tutorial.
+
+YOU MAY NOT, without written permission
+
+  - redistribute this plugin, in source or compiled form, modified or not;
+  - re-upload it anywhere, including plugin marketplaces, forums and file hosts;
+  - sell it, or include it in anything sold or given away as a bundle;
+  - present it, or a derivative of it, as your own work.
+
+VERIFYING A DOWNLOAD
+
+  Each release is published with the SHA-256 of its jar, and the build is reproducible:
+  the same source produces a byte-identical jar. If the hash of the file you have does
+  not match the one published with the release, it is not this plugin, whatever it says
+  on the tin. Do not run it.
+
+THE BUNDLED LIBRARY
+
+  This plugin bundles ItemBridge, which is separate work by the same author under the
+  MIT licence. Nothing here restricts your rights to that library; see its own
+  repository for its terms.
+
+NO WARRANTY
+
+  This software is provided "as is", without warranty of any kind, express or implied,
+  including but not limited to the warranties of merchantability, fitness for a
+  particular purpose and noninfringement. In no event shall the author be liable for any
+  claim, damages or other liability, whether in an action of contract, tort or
+  otherwise, arising from, out of or in connection with the software or the use or other
+  dealings in the software.

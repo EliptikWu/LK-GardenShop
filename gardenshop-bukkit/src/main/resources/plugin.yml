@@ -1,0 +1,68 @@
+name: LKGardenShop
+version: '${version}'
+main: dev.lk.gardenshop.LKGardenShopPlugin
+api-version: '1.21'
+authors: [LK]
+description: Sell Grow-a-Garden style harvests, priced by weight, paid through any Vault economy.
+website: https://discord.com/invite/ZfCC7amBu7
+
+# MythicMobs is a soft dependency, not a hard one: the plugin identifies harvests from
+# its own item tags when Mythic is absent, so a Mythic upgrade gone wrong degrades
+# instead of taking the server's economy offline.
+#
+# The item plugins below the blank line are the ones the bundled adapter can read. They
+# are listed for LOAD ORDER only: the adapter builds its registry during our onEnable by
+# asking which of them are installed, so one that loads after us would be missing from it
+# and its items would not be sellable. Naming a plugin nobody has is free -- softdepend
+# on an absent plugin is ignored.
+softdepend:
+  - MythicMobs
+  - MythicCrucible
+  - Vault
+  - VaultUnlocked
+  - PlaceholderAPI
+
+  - ItemsAdder
+  - Nexo
+  - Oraxen
+  - CraftEngine
+
+commands:
+  gardenshop:
+    description: Appraise and sell your harvests.
+    aliases: [gs, gshop]
+    usage: /gardenshop help
+
+permissions:
+  lkgardenshop.menu:
+    description: Open the shop menu with /gs.
+    default: true
+  lkgardenshop.sell:
+    description: Sell harvests with /gs sell.
+    default: true
+  lkgardenshop.value:
+    description: Appraise a harvest with /gs value.
+    default: true
+  lkgardenshop.favorite:
+    description: Protect a harvest from bulk sale with /gs favorite.
+    default: true
+  lkgardenshop.admin.reload:
+    description: Reload the configuration with /gs reload.
+    default: op
+  lkgardenshop.admin.info:
+    description: Inspect what is loaded with /gs info.
+    default: op
+  lkgardenshop.admin.prices:
+    description: Read the whole price sheet with /gs prices.
+    default: op
+  lkgardenshop.admin.adapter:
+    description: Map items from other item plugins onto crops with /gs adapter. Writes config and reloads.
+    default: op
+  lkgardenshop.admin:
+    description: All administrative permissions.
+    default: op
+    children:
+      lkgardenshop.admin.reload: true
+      lkgardenshop.admin.info: true
+      lkgardenshop.admin.prices: true
+      lkgardenshop.admin.adapter: true

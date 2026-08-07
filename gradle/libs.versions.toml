@@ -1,0 +1,55 @@
+[versions]
+# Compile against the LOWEST Minecraft version we support: a plugin built on the
+# 1.21.3 API also runs on every later 1.21.x. Bump only to use newer API.
+#
+# 1.21.3 specifically because that is what the target server runs. Building against a
+# newer API than the server has is how you get a NoSuchMethodError on a code path that
+# only executes once a month.
+paper = "1.21.3-R0.1-SNAPSHOT"
+# Tests run against a NEWER API than the plugin compiles against, because MockBukkit
+# hard-checks that the Paper API on its classpath matches the version it was built
+# against. Keeping these separate is what lets the runtime floor stay at 1.21.4.
+# If you bump mockbukkit, bump this to whatever version its error message names.
+paper-test = "1.21.11-R0.1-SNAPSHOT"
+mythic = "5.13.0"
+# ItemBridge: our own item-identity layer across MythicMobs, Crucible, ItemsAdder, Nexo,
+# Oraxen and CraftEngine. Built in the sibling checkout when it is there (see
+# settings.gradle.kts), otherwise resolved from JitPack.
+#
+# It replaced Wuason's Adapter, which does the same job for twelve plugins but is
+# GPL-3.0: shading it would have forced this whole plugin to be GPL-3.0 with its source
+# published, which is not the licence chosen for it.
+itembridge = "1.0.0"
+# Bytecode relocation. Bukkit's legacy class loaders share classes between plugins, so two
+# plugins shipping the same library under its own package would collide.
+shadow = "9.6.1"
+vault = "1.7"
+vault-unlocked = "2.16"
+placeholderapi = "2.11.6"
+junit = "5.11.4"
+assertj = "3.27.3"
+# Must track the paper version above: mockbukkit-v1.21 emulates the 1.21 API.
+mockbukkit = "4.108.0"
+
+[libraries]
+paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paper" }
+paper-api-test = { module = "io.papermc.paper:paper-api", version.ref = "paper-test" }
+mythic-dist = { module = "io.lumine:Mythic-Dist", version.ref = "mythic" }
+itembridge = { module = "dev.lk:itembridge", version.ref = "itembridge" }
+vault-api = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
+vault-unlocked-api = { module = "net.milkbowl.vault:VaultUnlockedAPI", version.ref = "vault-unlocked" }
+placeholderapi = { module = "me.clip:placeholderapi", version.ref = "placeholderapi" }
+
+junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
+
+junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+mockbukkit = { module = "org.mockbukkit.mockbukkit:mockbukkit-v1.21", version.ref = "mockbukkit" }
+# Test-only. The server has this at runtime — it is what turns the console banner's
+# components into ANSI — but paper-api does not expose it, so the render test needs it
+# explicitly. Must match the adventure version paper-api pulls in.
+adventure-ansi = { module = "net.kyori:adventure-text-serializer-ansi", version = "4.17.0" }
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

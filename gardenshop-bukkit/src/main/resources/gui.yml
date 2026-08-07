@@ -1,0 +1,152 @@
+# ============================================================================
+#  LKGardenShop - menu layout
+# ============================================================================
+#  THIS FILE IS NOT EXTRACTED to the plugin folder. It lives inside the jar
+#  because the slot positions are tied to the backdrop TEXTURE: moving a button
+#  without redrawing the art just puts it somewhere the art does not expect.
+#
+#  If you do want to change it, drop a copy of this file at
+#  plugins/LKGardenShop/gui.yml and it wins over this one. Nothing is ever
+#  written out on its own.
+#
+#  Slot numbering, left to right, top to bottom, from 0:
+#
+#     row 1:  0  1  2  3  4  5  6  7  8
+#     row 2:  9 10 11 12 13 14 15 16 17
+#     row 3: 18 19 20 21 22 23 24 25 26
+#     row 4: 27 28 29 30 31 32 33 34 35
+#     row 5: 36 37 38 39 40 41 42 43 44
+#     row 6: 45 46 47 48 49 50 51 52 53
+#
+#  A slot outside the menu's row count is an error and is reported on reload.
+#  Remove a button's slot entirely to hide it.
+# ============================================================================
+
+# Set to false to run command-only: /gs then prints help instead of opening the shop.
+enabled: true
+
+# Whether the resource pack's art is used.
+#
+#   styled  (default) always. Assumes every player has the pack.
+#   plain             never: vanilla item icons and a plain text title. For servers
+#                     that ship no pack.
+#   auto              per player. Anyone who declined or failed to download OUR
+#                     pack gets 'plain'. If we do not send it ourselves there is
+#                     no reliable signal and 'styled' is assumed.
+#
+# Ignored when resource-pack.installed is false in config.yml -- that forces
+# 'plain' everywhere, because pack art on a player without the pack is not
+# decoration, it is a row of missing-character boxes.
+style: styled
+
+# Show the confirmation screen before a bulk sale.
+#
+# Leave this on. /gs sell all is irreversible and one misclick wide, and the
+# confirmation screen is also where the "N crops are favorited" count appears --
+# which is what tells a player whether they remembered to protect their best
+# harvest before emptying the bag.
+confirm-bulk-sale: true
+
+# Close open menus during /gs reload rather than re-rendering them.
+#
+# With this off menus are refreshed in place instead, which is smoother but means
+# a player halfway through confirming a sale can have the total change under
+# their cursor.
+close-menus-on-reload: true
+
+
+# ---------------------------------------------------------------------------
+#  The shop front
+# ---------------------------------------------------------------------------
+#  SIX rows, and that is not arbitrary. The art in shop_gui.png is 222 px tall,
+#  which is the exact height of a 6-row chest window, and the 9x4 grid in its
+#  lower third lines up with the player's three inventory rows plus the hotbar.
+#  Fewer rows and the stand hangs below the window's bottom edge.
+# ---------------------------------------------------------------------------
+sell-menu:
+  rows: 6
+
+  # Which backdrop from the pack's font to draw. 'shop' is shop_gui.png; blank
+  # or anything unrecognised means no backdrop.
+  background: shop
+
+  # Horizontal nudge in pixels. -48 centres the 256-wide canvas on the 176-wide
+  # window: the title cursor starts at x=8 and centring wants the left edge at
+  # (176-256)/2 = -40.
+  #
+  # Change this and /gs reload -- it needs no pack rebuild. Vertical position and
+  # scale live in the pack's font/gui.json (ascent and height) and DO need
+  # ./gradlew packZip afterwards.
+  background-x-offset: -48
+
+  # No filler: the backdrop fills the window, and a wall of glass panes would hide
+  # the very thing the pack exists to show.
+  filler: ''
+
+  slots:
+    stats: 4         # lifetime earnings
+    held: 22         # the crop in your hand, appraised
+    sell-hand: 38
+    sell-all: 40
+    prices: 42       # opens the price book
+
+  # Per-button look. Two forms are accepted:
+  #
+  #   sell-all: CHEST                                    just a vanilla material
+  #   sell-all: { material: PAPER, model-data: 74002, fallback-material: CHEST }
+  #
+  # 'model-data' is a CustomModelData the resource pack redirects to your own
+  # texture. 'fallback-material' is what a player WITHOUT the pack sees, which is
+  # why every custom icon should have one -- a bare PAPER with no pack looks like
+  # a blank sheet.
+  #
+  # No icon textures ship yet, so these are all plain vanilla materials. See
+  # resourcepack/README.md for how to add one.
+  icons:
+    sell-hand: GOLD_INGOT
+    sell-all: CHEST
+    prices: BOOK
+    stats: GOLDEN_HOE
+    held: BARRIER
+
+
+# ---------------------------------------------------------------------------
+#  "Are you sure" before a bulk sale
+# ---------------------------------------------------------------------------
+#  No backdrop art for this one yet: shop_gui.png is drawn for a 6-row window and
+#  this screen is 3 rows. It keeps the vanilla chest look until there is art for
+#  it, at which point add a bitmap provider to the pack's font/gui.json and name
+#  it here.
+# ---------------------------------------------------------------------------
+confirm-menu:
+  rows: 3
+  background: ''
+  filler: GRAY_STAINED_GLASS_PANE
+  slots:
+    confirm: 11
+    summary: 13
+    cancel: 15
+  icons:
+    confirm: LIME_CONCRETE
+    summary: PAPER
+    cancel: RED_CONCRETE
+
+
+# ---------------------------------------------------------------------------
+#  The price book
+# ---------------------------------------------------------------------------
+#  The bottom row is navigation; everything above it is content. With 6 rows that
+#  leaves 45 content slots, so a crop's 30 drop types fit on one page.
+# ---------------------------------------------------------------------------
+price-book:
+  rows: 6
+  background: ''
+  filler: ''
+  slots:
+    previous-page: 45
+    back: 49
+    next-page: 53
+  icons:
+    back: ARROW
+    previous-page: SPECTRAL_ARROW
+    next-page: SPECTRAL_ARROW

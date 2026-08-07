@@ -1,0 +1,360 @@
+# ============================================================================
+#  LKGardenShop - wording
+# ============================================================================
+#  MiniMessage format: <green>, <gradient:#a>, <bold>, <hover:show_text:'...'>.
+#  Reference: https://docs.advntr.dev/minimessage/format.html
+#
+#  Use <prefix> wherever you want the prefix; it is not added automatically, so
+#  single-line notices and multi-line breakdowns can look different.
+#
+#  Set any message to '' to silence it. Placeholders in <angle brackets> are
+#  supplied by the plugin -- an unknown one simply renders as literal text.
+#
+#  Reloads with /gs reload. A missing key falls back to the bundled default, so a
+#  future version never leaves players staring at a raw key.
+# ============================================================================
+
+prefix: '<dark_green>[<green>Garden<white>Shop<dark_green>] '
+
+# ---------------------------------------------------------------------------
+#  Startup banner, printed to the console once on enable.
+#
+#  Colour here is the garnish; the checklist is the point. This plugin can start
+#  in several partially-wired states -- no economy, no MythicMobs, a weights file
+#  that did not load -- and each one otherwise surfaces as a warning buried in a
+#  hundred other plugins' output.
+#
+#  Turn the whole thing off with console.banner: false in config.yml, and only the
+#  one-line summary is printed. Gradients degrade to plain text on a terminal
+#  without colour support, so there is nothing to configure for that.
+# ---------------------------------------------------------------------------
+console:
+  header:
+    - ''
+    - '  <gradient:#1b5e20:#76ff03>▄▄▄  LK GardenShop  ▄▄▄</gradient>'
+    - '  <dark_gray>v<version> <dark_gray>· <gray><server>'
+    - ''
+
+  # One row per checked subsystem. <label> is padded for you.
+  entry: '  <status> <gray><label> <white><detail>'
+
+  status:
+    ok: '<green>✔'
+    warn: '<yellow>▲'
+    # Named 'disabled' and not 'off': YAML 1.1 reads a bare off/on/yes/no as a boolean,
+    # so an 'off:' key becomes false and the lookup silently misses.
+    disabled: '<red>✖'
+
+  footer:
+    - ''
+    - '  <dark_gray>Ready in <gray><ms>ms<dark_gray> · <gray><problems> <dark_gray>thing(s) to look at · <gray>/gs info'
+    - ''
+
+  # Printed instead of the whole banner when console.banner is false.
+  summary: '<prefix><green>Enabled v<version> in <white><ms>ms <gray>(<white><problems> <gray>thing(s) to look at, see /gs info)'
+
+no-permission: '<prefix><red>You do not have permission to do that.'
+players-only: '<prefix><red>Only a player can use that.'
+unknown-subcommand: '<prefix><red>Unknown subcommand <white><input><red>. Try <white>/gs help<red>.'
+
+help:
+  - '<dark_green><strikethrough>                                        '
+  - '<green><bold>GardenShop'
+  - '<gray>Sell your harvests. Heavier crops are worth more.'
+  - ''
+  - '<green>/gs <dark_gray>- <gray>open the shop menu'
+  - '<green>/gs value <dark_gray>- <gray>what is the crop in your hand worth?'
+  - '<green>/gs sell hand <dark_gray>- <gray>sell the stack you are holding'
+  - '<green>/gs sell all <dark_gray>- <gray>sell every crop, skipping favorites'
+  - '<green>/gs favorite <dark_gray>- <gray>protect the held crop from <white>/gs sell all'
+  - '<dark_green><strikethrough>                                        '
+
+# Appended to the help above only for senders with an admin permission.
+help-admin:
+  - '<gold>/gs prices <dark_gray>[<gray>crop<dark_gray>] <dark_gray>- <gray>the whole price sheet'
+  - '<gold>/gs reload <dark_gray>- <gray>re-read the config files'
+  - '<gold>/gs info <dark_gray>- <gray>what is loaded and what is broken'
+  - '<gold>/gs adapter <dark_gray>- <gray>sell items from your other item plugins'
+  - '<dark_green><strikethrough>                                        '
+
+# ---------------------------------------------------------------------------
+#  The calibration sheet. /gs prices for the overview, /gs prices <crop> for
+#  every drop type of one crop.
+prices:
+  header: '<prefix><green><bold>Price sheet <gray>(<white><mode><gray> mode, <white><types> <gray>drop types)'
+
+  # <mintype> and <maxtype> are the Mythic type names behind the extremes -- handy
+  # when a number looks wrong and you need to know which drop produced it.
+  crop: '<dark_gray>  - <crop> <dark_gray>[<gray><id><dark_gray>] <gray>typical <gold><typical> <dark_gray>| <gray>range <white><min> <dark_gray>-> <gold><max> <dark_gray>(<white><multiple>x<dark_gray>)'
+
+  spread: '<prefix><gray>Whole garden: <white><min> <dark_gray>-> <gold><max> <dark_gray>(<white><multiple>x <gray>from cheapest to dearest)'
+
+  hint: '<gray>Use <white>/gs prices <crop-id> <gray>for every drop type of one crop.'
+
+  crop-header: '<prefix><green><bold><crop> <gray>- <white><count> <gray>drop types, base <white><base><gray>, reference weight <white><ref>kg'
+
+  # One row per drop type. <spread> is how much the weight range alone is worth
+  # within that type.
+  type: '<dark_gray>  <gray><variant> <dark_gray>| <aqua><mutations> <dark_gray>| <white><wmin>-<wmax>kg <dark_gray>| <band> <dark_gray>| <gold><pmin> <dark_gray>-> <gold><pmax> <dark_gray>(<white><spread>x<dark_gray>)'
+
+  unknown-crop: '<prefix><red>No crop with id <white><input><red>. Known: <gray><known>'
+
+# ---------------------------------------------------------------------------
+sell:
+  usage: '<prefix><red>Use <white>/gs sell hand<red> or <white>/gs sell all<red>.'
+
+  success: '<prefix><green>Sold <white><items> <green>crop(s) in <white><stacks> <green>stack(s) for <gold><amount><green>.'
+
+  nothing: '<prefix><yellow>You are not holding a crop, and there is nothing sellable in your bag.'
+
+  all-favorited: '<prefix><yellow>Every crop you have is favorited <gray>(<white><count><gray>). Unfavorite one with <white>/gs favorite<gray>.'
+
+  skipped-favorites: '<prefix><gray>Kept <white><count> <gray>favorited crop(s) out of the sale.'
+
+  left-over-limit: '<prefix><gray>Left <white><count> <gray>crop(s) behind - one sale can only take so many. Sell again to clear the rest.'
+
+  # Only appears if a price multiplier is badly misconfigured; the console gets a
+  # warning at the same time.
+  capped: '<prefix><yellow>That sale hit the per-sale payout cap and was paid out at <white><amount><yellow>. Tell an admin.'
+
+  economy-unavailable: '<prefix><red>Selling is unavailable right now: <white><reason><red>.'
+
+  # The player keeps their crops in this case - say so plainly, or they will
+  # assume the items are gone.
+  deposit-failed: '<prefix><red>The payout failed, so your crops were returned. <gray>(<white><reason><gray>)'
+
+  inventory-changed: '<prefix><yellow>Your inventory changed mid-sale, so nothing was sold. Try again.'
+
+  cooldown: '<prefix><yellow>You can sell again in <white><seconds>s<yellow>.'
+
+# ---------------------------------------------------------------------------
+value:
+  not-a-crop: '<prefix><yellow>That is not a sellable crop.'
+
+  header: '<prefix><green><bold>Appraisal'
+  identity: '<gray>  Crop <dark_gray>| <crop> <dark_gray>| <gray>Variant <white><variant>'
+  mutations: '<gray>  Mutations <dark_gray>| <aqua><mutations>'
+  weight: '<gray>  Weight <dark_gray>| <white><weight>kg <dark_gray>(<band><dark_gray>)'
+  unit: '<gray>  Each <dark_gray>| <gold><unit>'
+  total: '<gray>  Stack of <white><amount> <dark_gray>| <gold><bold><total>'
+
+  # The breakdown of how that price was reached. Set to '' if you would rather
+  # players not see the multipliers.
+  factor: '<dark_gray>    - <gray><factor> <dark_gray><label> <dark_gray>=> <white><value>'
+
+  inventory: '<prefix><gray>Everything sellable in your bag: <gold><total> <gray>(<white><items> <gray>crops)'
+
+# ---------------------------------------------------------------------------
+favorite:
+  not-a-crop: '<prefix><yellow>Hold a crop to favorite it.'
+  added: '<prefix><green>Favorited. <gray>This crop will be skipped by <white>/gs sell all<gray>.'
+  removed: '<prefix><yellow>Unfavorited. <gray>This crop can now be sold in bulk.'
+
+# ---------------------------------------------------------------------------
+reload:
+  success: '<prefix><green>Reloaded. <white><types> <gray>drop types across <white><crops> <gray>crops, pricing mode <white><mode><gray>.'
+
+  # Nothing was applied: the previous configuration is still live.
+  failed: '<prefix><red>Reload rejected - your previous settings are still active. Fix these and try again:'
+
+  error: '<red>  x <white><file><gray> <path> <dark_gray>- <red><message>'
+  warning: '<yellow>  ! <white><file><gray> <path> <dark_gray>- <yellow><message>'
+  more-issues: '<gray>  ... and <white><count> <gray>more. See the console for the full list.'
+
+# ---------------------------------------------------------------------------
+#  Menu text. Layout (rows, slots, materials) lives in gui.yml.
+#
+#  Item names and lore are NOT prefixed -- <prefix> in a lore line would look odd.
+#  Lore is written as a list; each entry is one line.
+gui:
+  # Reasons shown on a disabled button. Kept separate so they can be reused.
+  reason:
+    not-a-crop: 'not holding a crop'
+    nothing-to-sell: 'nothing sellable in your bag'
+
+  sell-menu:
+    title: '<dark_green>Garden Shop'
+
+    held:
+      name: '<green>In your hand'
+      lore:
+        - '<gray>Crop <dark_gray>| <crop>'
+        - '<gray>Variant <dark_gray>| <white><variant>'
+        - '<gray>Mutations <dark_gray>| <aqua><mutations>'
+        - '<gray>Weight <dark_gray>| <white><weight>kg <dark_gray>(<band><dark_gray>)'
+        - ''
+        - '<gray>Each <dark_gray>| <gold><unit>'
+        - '<gray>Stack of <white><amount> <dark_gray>| <gold><bold><total>'
+      empty-name: '<yellow>Nothing in your hand'
+      empty-lore:
+        - '<gray>Hold a crop to see what it is worth.'
+
+    sell-hand:
+      name: '<green><bold>Sell what you are holding'
+      lore:
+        - '<gray>Pays <gold><total> <gray>for <white><amount> <gray>crop(s).'
+        - ''
+        - '<dark_gray>Favorites are ignored here -- you'
+        - '<dark_gray>picked this one yourself.'
+      disabled-name: '<dark_gray>Cannot sell that'
+      disabled-lore:
+        - '<gray><reason>'
+
+    sell-all:
+      name: '<green><bold>Sell everything'
+      lore:
+        - '<gray>Value <dark_gray>| <gold><total>'
+        - '<gray>Crops <dark_gray>| <white><items> <gray>in <white><stacks> <gray>stack(s)'
+        - ''
+        - '<dark_gray>Favorited crops are left alone.'
+      empty-name: '<dark_gray>Nothing to sell'
+      empty-lore:
+        - '<gray><reason>'
+
+    prices:
+      name: '<gold><bold>Price book'
+      lore:
+        - '<gray>What every crop is worth, across'
+        - '<gray>its whole weight range.'
+        - ''
+        - '<gray><crops> <gray>crops.'
+
+    stats:
+      name: '<aqua><player>'
+      lore:
+        - '<gray>Earned <dark_gray>| <gold><earned>'
+        - '<gray>Crops sold <dark_gray>| <white><sold>'
+        - '<gray>Sales <dark_gray>| <white><sales>'
+
+  confirm-menu:
+    title: '<dark_red>Sell everything?'
+
+    summary:
+      name: '<white><bold>This sale'
+      lore:
+        - '<gray>Value <dark_gray>| <gold><total>'
+        - '<gray>Crops <dark_gray>| <white><items> <gray>in <white><stacks> <gray>stack(s)'
+        - ''
+        - '<gray>Favorited and kept <dark_gray>| <white><favorites>'
+
+    confirm:
+      name: '<green><bold>Yes, sell them'
+      lore:
+        - '<gray>Pays <gold><total><gray>.'
+        - ''
+        - '<dark_gray>Re-priced when you click, so the'
+        - '<dark_gray>figure above is a quote.'
+
+    cancel:
+      name: '<red><bold>No, take me back'
+      lore:
+        - '<gray>Nothing is sold.'
+
+    # Only sent when the inventory changed between opening this screen and confirming.
+    total-changed: '<prefix><yellow>Your bag changed, so you were paid <gold><paid> <yellow>instead of the quoted <white><quoted><yellow>.'
+
+  price-book:
+    title: '<gold>Price book'
+    crop-title: '<gold>Prices <dark_gray>| <crop>'
+
+    crop:
+      name: '<crop>'
+      lore:
+        - '<dark_gray><id>'
+        - ''
+        - '<gray>Typical <dark_gray>| <gold><typical>'
+        - '<gray>Range <dark_gray>| <white><min> <dark_gray>-> <gold><max>'
+        - '<gray>Best is <white><multiple>x <gray>the worst'
+        - '<gray>Reference weight <dark_gray>| <white><ref>kg'
+        - ''
+        - '<yellow>Click for every drop type.'
+
+    type:
+      name: '<white><variant> <dark_gray>| <aqua><mutations>'
+      lore:
+        - '<gray>Weight <dark_gray>| <white><wmin>-<wmax>kg'
+        - '<gray>Band <dark_gray>| <band>'
+        - ''
+        - '<gray>At lightest <dark_gray>| <gold><pmin>'
+        - '<gray>At heaviest <dark_gray>| <gold><pmax>'
+        - '<gray>Weight alone is <white><spread>x'
+        - ''
+        - '<dark_gray><type>'
+
+    back-to-shop: '<yellow>Back to the shop'
+    back-to-crops: '<yellow>Back to all crops'
+    previous-page: '<yellow>Page <page> of <pages>'
+    next-page: '<yellow>Page <page> of <pages>'
+
+# ---------------------------------------------------------------------------
+info:
+  header: '<prefix><green><bold>Status'
+  economy: '<gray>  Economy <dark_gray>| <white><provider> <dark_gray>(available: <white><available><dark_gray>)'
+  pricing: '<gray>  Pricing <dark_gray>| <white><mode><gray>, <white><bands> <gray>bands, interpolate <white><interpolate>'
+  registry: '<gray>  Loaded <dark_gray>| <white><types> <gray>types, <white><crops> <gray>crops, <white><weights> <gray>weight ranges'
+  mythic: '<gray>  MythicMobs <dark_gray>| <white><available> <dark_gray>(<white><known> <dark_gray>items known)'
+  pack: '<gray>  Resource pack <dark_gray>| <white><mode> <dark_gray>(<gray><detail><dark_gray>), menu style <white><style><dark_gray>, <white><loaded> <dark_gray>player(s) loaded it'
+  stats: '<gray>  Stats <dark_gray>| <white><enabled> <dark_gray>(<white><players> <dark_gray>players tracked)'
+  crop: '<dark_gray>    - <white><crop> <dark_gray>[<gray><id><dark_gray>/<gray><token><dark_gray>] <gray>base <white><base><gray>, ref <white><weight>kg'
+
+  # The single most useful diagnostic: types this plugin prices that the Mythic
+  # pack does not actually have, which would make those drops unsellable.
+  missing-types: '<red>  x <white><count> <red>type(s) are not in the Mythic pack, starting with <white><first><red>. Those drops cannot be sold.'
+
+# ---------------------------------------------------------------------------
+#  /gs adapter -- mapping items from OTHER item plugins onto our crops.
+#
+#  Only needed if crops come from somewhere other than the Mythic pack. Mythic
+#  and Crucible items are identified automatically.
+# ---------------------------------------------------------------------------
+adapter:
+  header: '<prefix><green><bold>Item adapter'
+  status: '<gray>  <white><items> <gray>item(s) known across your item plugins, <white><bindings> <gray>bound in <white><file>'
+
+  usage:
+    - '<gray>  /gs adapter hand <dark_gray>- the ids of the item you are holding'
+    - '<gray>  /gs adapter list [text] <dark_gray>- search every id your plugins know'
+    - '<gray>  /gs adapter bind <crop> [id] <dark_gray>- sell the held item as that crop'
+    - '<gray>  /gs adapter unbind [id] <dark_gray>- undo it'
+
+  unavailable: '<prefix><red>The item adapter did not start, so there is nothing to map. See the console.'
+
+  hand:
+    empty: '<prefix><yellow>Hold the item you want to map.'
+    no-ids: '<prefix><yellow>No item plugin recognises that. Nothing to bind.'
+    header: '<prefix><green>That item answers to:'
+
+    # Already sellable -- either bound, or a Mythic id, which needs no binding.
+    resolved: '<green>  + <white><id> <dark_gray>-> <gray>sells as <white><crop>'
+    bindable: '<yellow>  ? <white><id> <dark_gray>-> <gray>not mapped yet'
+    # Never bindable. Binding a plain material would make every one of them sell.
+    vanilla: '<dark_gray>  - <gray><id> <dark_gray>(vanilla material, cannot be bound)'
+
+  list:
+    header: '<prefix><green><white><count> <gray>id(s) match <white><filter><gray>:'
+    entry: '<dark_gray>  - <gray><id>'
+    more: '<dark_gray>  ... and <white><count> <dark_gray>more. Narrow it with /gs adapter list <text>'
+    empty: '<prefix><yellow>No id matches <white><filter><yellow>.'
+
+  bind:
+    usage: '<prefix><yellow>/gs adapter bind <crop> [id] <gray>- hold the item, or spell out its id.'
+    unknown-crop: '<prefix><red>No crop called <white><crop><red>. Known: <gray><crops>'
+    unknown-id: '<prefix><red>No item plugin knows <white><id><red>. Check the spelling with /gs adapter list.'
+
+    # The guard that matters most. See AdapterSources.VANILLA.
+    vanilla: '<prefix><red>Refusing to bind <white><id><red>: that is a plain vanilla material, so every one of them on the server would become a crop.'
+
+    already: '<prefix><yellow><white><id> <yellow>already sells as <white><crop><yellow>. Nothing to do.'
+    no-candidates: '<prefix><yellow>That item only has vanilla ids, so there is nothing to bind.'
+    ambiguous: '<prefix><yellow>That item has <white><count> <yellow>bindable ids, so pick one: <gray>/gs adapter bind <crop> <id>'
+    ambiguous-entry: '<dark_gray>  - <gray><id>'
+
+    done: '<prefix><green>Bound <white><id> <green>to <white><crop><green>. It sells as that crop''s plain drop.'
+    replaced: '<prefix><green>Bound <white><id> <green>to <white><crop><gray> (was <previous>).'
+
+  unbind:
+    done: '<prefix><green>Unbound <white><id><green>. It no longer sells as <white><crop><green>.'
+    not-bound: '<prefix><yellow><white><id> <yellow>was not bound.'
+    nothing-bound: '<prefix><yellow>Nothing bound to the item you are holding.'
+
+  write-failed: '<prefix><red>Could not write <white><file><red>: <gray><message>'

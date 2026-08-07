@@ -3,6 +3,7 @@ package dev.lk.gardenshop.listener;
 import dev.lk.gardenshop.config.ConfigService;
 import dev.lk.gardenshop.core.ConfigSnapshot;
 import dev.lk.gardenshop.item.MythicItems;
+import dev.lk.gardenshop.item.PackIntegrity;
 import dev.lk.gardenshop.item.WeightStamper;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
@@ -46,14 +47,16 @@ public final class MythicEventBridge implements Listener {
     private final ConfigService configs;
     private final MythicItems mythic;
     private final WeightStamper stamper;
+    private final PackIntegrity packIntegrity;
     private final Logger logger;
 
     public MythicEventBridge(Plugin plugin, ConfigService configs, MythicItems mythic,
-                             WeightStamper stamper) {
+                             WeightStamper stamper, PackIntegrity packIntegrity) {
         this.plugin = plugin;
         this.configs = configs;
         this.mythic = mythic;
         this.stamper = stamper;
+        this.packIntegrity = packIntegrity;
         this.logger = plugin.getLogger();
     }
 
@@ -132,7 +135,19 @@ public final class MythicEventBridge implements Listener {
      * pack. A renamed drop would otherwise become quietly unsellable.
      */
     private void verifyAgainstPack() {
-        if (!configs.isLoaded() || !mythic.isAvailable()) {
+        if (!configs.isLoaded()) {
+            return;
+        }
+        // Re-run the integrity check first: a /mm reload is exactly when a pack appears or vanishes,
+        // and it is the event that lets a server which loaded MythicMobs late start trading without
+        // a restart.
+        PackIntegrity.Report report = packIntegrity.verify(configs.snapshot(), mythic);
+        if (report.satisfied()) {
+            return;
+        }
+        logger.warning("After the MythicMobs reload: " + report.summary() + ".");
+
+        if (!mythic.isAvailable()) {
             return;
         }
         ConfigSnapshot snapshot = configs.snapshot();

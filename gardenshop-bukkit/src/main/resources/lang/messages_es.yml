@@ -131,6 +131,11 @@ sell:
 
   cooldown: '<prefix><yellow>Puedes vender de nuevo en <white><seconds>s<yellow>.'
 
+  # Se muestra en lugar de "no hay nada que vender" cuando el servidor no tiene el pack
+  # de cultivos. La distincion importa: a un jugador con la mochila llena y un mensaje
+  # de que esta vacia no le queda forma de saber que el fallo es del servidor.
+  crop-pack-missing: '<prefix><red>La tienda no esta configurada: <white><reason><red>. Avisa a un admin, esto no lo puedes arreglar tu.'
+
 # ---------------------------------------------------------------------------
 value:
   not-a-crop: '<prefix><yellow>Eso no es una cosecha vendible.'
@@ -164,6 +169,9 @@ reload:
   error: '<red>  x <white><file><gray> <path> <dark_gray>- <red><message>'
   warning: '<yellow>  ! <white><file><gray> <path> <dark_gray>- <yellow><message>'
   more-issues: '<gray>  ... y <white><count> <gray>mas. La lista completa esta en la consola.'
+
+  # La config cargo bien, pero MythicMobs sigue sin tener los cultivos que se cotizan.
+  crop-pack: '<yellow>  ! Pack de cultivos: <white><reason><yellow>. La venta sigue apagada mientras items.require-crop-pack este en true.'
 
 # ---------------------------------------------------------------------------
 #  Texto de los menus. El layout (filas, slots, materiales) vive en gui.yml.

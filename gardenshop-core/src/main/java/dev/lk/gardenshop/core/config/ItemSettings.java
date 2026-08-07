@@ -15,14 +15,24 @@ import java.util.Objects;
  *                          {@code %s} where the formatted weight goes
  * @param weightLoreMarker  substring identifying the lore line to replace, matched
  *                          case-insensitively after colour codes are stripped
+ * @param requireCropPack   refuse to sell and refuse to open the shop while MythicMobs does not
+ *                          have the crops this file prices. Off, selling simply finds nothing and
+ *                          players are told there is nothing to sell — which is true and useless
  */
 public record ItemSettings(
         boolean stampOnGenerate,
         boolean rewriteLore,
         boolean legacyLoreFallback,
         String weightLoreFormat,
-        String weightLoreMarker
+        String weightLoreMarker,
+        boolean requireCropPack
 ) {
+
+    /** Without the pack gate, which defaults to on. */
+    public ItemSettings(boolean stampOnGenerate, boolean rewriteLore, boolean legacyLoreFallback,
+                        String weightLoreFormat, String weightLoreMarker) {
+        this(stampOnGenerate, rewriteLore, legacyLoreFallback, weightLoreFormat, weightLoreMarker, true);
+    }
 
     public ItemSettings {
         Objects.requireNonNull(weightLoreFormat, "weightLoreFormat");

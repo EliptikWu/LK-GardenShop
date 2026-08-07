@@ -49,6 +49,22 @@ economy:
   currency: ''
 
 items:
+  # Refuse to sell, and refuse to open the shop, while MythicMobs does not have the
+  # crops this plugin prices.
+  #
+  # This is a DIAGNOSTIC, not a lock. Without it the failure is still total but
+  # silent: crops.yml describes 180 harvest types, no item in the world matches any
+  # of them, and every sale answers "you have nothing to sell" -- to a player holding
+  # a bag of crops. With it on, they are told the server is missing its crop pack,
+  # which is something they can actually report.
+  #
+  # Verified at startup, on /gs reload and after a /mm reload -- not once at enable,
+  # because MythicMobs can register its items after this plugin has finished loading
+  # and a single early check would lock a perfectly good server out of trading.
+  #
+  # Turn it off if you are mid-migration and want selling to limp along.
+  require-crop-pack: true
+
   # Roll and store a harvest's weight the moment MythicMobs generates it.
   #
   # Leave this on. With it off, weights are assigned the first time an item is

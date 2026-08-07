@@ -36,7 +36,15 @@ public record SellResult(
         /** The inventory changed mid-sale; nothing was taken. */
         INVENTORY_CHANGED,
         /** The player's sell cooldown has not elapsed. */
-        ON_COOLDOWN
+        ON_COOLDOWN,
+        /**
+         * MythicMobs does not have the crops this plugin prices, so nothing was touched.
+         *
+         * <p>Named rather than reported as "nothing to sell", which is what it would otherwise look
+         * like: without the pack every item in the world fails to match, and a player told there is
+         * nothing sellable in a bag full of crops has no way to know the server is misconfigured.
+         */
+        CROP_PACK_MISSING
     }
 
     public SellResult {
@@ -58,6 +66,11 @@ public record SellResult(
 
     public static SellResult failure(Outcome outcome, String error) {
         return new SellResult(outcome, List.of(), BigDecimal.ZERO, 0, 0, 0, false, error);
+    }
+
+    /** @param reason the integrity report's summary, so the message can say what is actually wrong */
+    public static SellResult cropPackMissing(String reason) {
+        return failure(Outcome.CROP_PACK_MISSING, reason);
     }
 
     public static SellResult nothingToSell(int skippedFavorites) {

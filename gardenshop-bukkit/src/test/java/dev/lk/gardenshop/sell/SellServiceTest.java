@@ -30,6 +30,7 @@ import dev.lk.gardenshop.item.ItemKeys;
 import dev.lk.gardenshop.item.ItemTagService;
 import dev.lk.gardenshop.item.LoreWeightParser;
 import dev.lk.gardenshop.item.MythicItems;
+import dev.lk.gardenshop.item.PackIntegrity;
 import dev.lk.gardenshop.item.WeightStamper;
 import dev.lk.gardenshop.stats.PlayerStats;
 import dev.lk.gardenshop.stats.PlayerStatsRepository;
@@ -74,6 +75,7 @@ class SellServiceTest {
     private ItemTagService tags;
     private DropRegistry registry;
     private ConfigSnapshot snapshot;
+    private PackIntegrity packIntegrity;
 
     @BeforeEach
     void setUp() {
@@ -97,8 +99,14 @@ class SellServiceTest {
         economy = new CountingEconomy();
 
         StatsService stats = new StatsService(new NoOpStatsRepository(), Logger.getLogger("test"), false);
+
+        // A mock server has no MythicMobs, so an unverified PackIntegrity would report the pack as
+        // absent and every test here would be refused before it began. The snapshot below turns the
+        // gate off, which is what these tests are about: the sell path itself.
+        packIntegrity = new PackIntegrity();
+
         sell = new SellService(() -> snapshot, resolver, tags,
-                new PriceCalculator(), () -> economy, stats, Logger.getLogger("test"));
+                new PriceCalculator(), () -> economy, stats, packIntegrity, Logger.getLogger("test"));
     }
 
     @AfterEach
@@ -136,7 +144,10 @@ class SellServiceTest {
         DropRegistry registry = MythicTypeComposer.withDefaultPattern()
                 .buildRegistry(List.of(odre()), WeightTable.empty());
 
-        return new ConfigSnapshot("en", pricing, ItemSettings.defaults(), SellingSettings.defaults(),
+        // requireCropPack false: see setUp().
+        ItemSettings items = new ItemSettings(true, true, true, "&f&lWeight: &r%skg", "weight:", false);
+
+        return new ConfigSnapshot("en", pricing, items, SellingSettings.defaults(),
                 EconomySettings.defaults(), GuiSettings.defaults(), ResourcePackSettings.defaults(),
                 registry, WeightTable.empty(), ValidationReport.empty(), System.currentTimeMillis());
     }

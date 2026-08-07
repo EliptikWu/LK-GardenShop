@@ -376,7 +376,8 @@ public final class YamlConfigLoader {
                 reader.bool("rewrite-lore", defaults.rewriteLore()),
                 reader.bool("legacy-lore-fallback", defaults.legacyLoreFallback()),
                 format,
-                reader.string("weight-lore-marker", defaults.weightLoreMarker()));
+                reader.string("weight-lore-marker", defaults.weightLoreMarker()),
+                reader.bool("require-crop-pack", defaults.requireCropPack()));
     }
 
     private SellingSettings readSellingSettings(YamlConfiguration general, ValidationReport.Builder report) {

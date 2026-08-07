@@ -127,6 +127,11 @@ sell:
 
   cooldown: '<prefix><yellow>You can sell again in <white><seconds>s<yellow>.'
 
+  # Shown instead of "nothing to sell" when the server has no crop pack installed. The
+  # distinction matters: a player holding a full bag being told it is empty has no way
+  # to know the fault is the server's. See items.require-crop-pack.
+  crop-pack-missing: '<prefix><red>The shop is not set up: <white><reason><red>. Tell an admin — this is not something you can fix.'
+
 # ---------------------------------------------------------------------------
 value:
   not-a-crop: '<prefix><yellow>That is not a sellable crop.'
@@ -160,6 +165,9 @@ reload:
   error: '<red>  x <white><file><gray> <path> <dark_gray>- <red><message>'
   warning: '<yellow>  ! <white><file><gray> <path> <dark_gray>- <yellow><message>'
   more-issues: '<gray>  ... and <white><count> <gray>more. See the console for the full list.'
+
+  # The config reloaded fine, but MythicMobs still does not have the crops it prices.
+  crop-pack: '<yellow>  ! Crop pack: <white><reason><yellow>. Selling stays off while items.require-crop-pack is true.'
 
 # ---------------------------------------------------------------------------
 #  Menu text. Layout (rows, slots, materials) lives in gui.yml.

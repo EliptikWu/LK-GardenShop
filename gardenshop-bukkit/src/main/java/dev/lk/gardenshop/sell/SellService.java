@@ -7,6 +7,7 @@ import dev.lk.gardenshop.economy.DepositResult;
 import dev.lk.gardenshop.economy.EconomyProvider;
 import dev.lk.gardenshop.item.HarvestResolver;
 import dev.lk.gardenshop.item.ItemTagService;
+import dev.lk.gardenshop.item.PackIntegrity;
 import dev.lk.gardenshop.stats.StatsService;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -62,6 +63,7 @@ public final class SellService {
     private final PriceCalculator calculator;
     private final Supplier<EconomyProvider> economy;
     private final StatsService stats;
+    private final PackIntegrity packIntegrity;
     private final Logger logger;
 
     /** Last successful sale per player, for the cooldown. */
@@ -69,14 +71,25 @@ public final class SellService {
 
     public SellService(Supplier<ConfigSnapshot> configs, HarvestResolver resolver, ItemTagService tags,
                        PriceCalculator calculator, Supplier<EconomyProvider> economy, StatsService stats,
-                       Logger logger) {
+                       PackIntegrity packIntegrity, Logger logger) {
         this.configs = configs;
         this.resolver = resolver;
         this.tags = tags;
         this.calculator = calculator;
         this.economy = economy;
         this.stats = stats;
+        this.packIntegrity = packIntegrity;
         this.logger = logger;
+    }
+
+    /**
+     * Whether the crop pack is missing and the owner asked us to refuse in that case.
+     *
+     * <p>Reads a stored report rather than re-checking: verification walks every declared type
+     * against Mythic's registry, which is fine once at enable and wrong once per sale.
+     */
+    public boolean blockedByMissingPack() {
+        return configs.get().items().requireCropPack() && !packIntegrity.latest().satisfied();
     }
 
     public EconomyProvider provider() {
@@ -131,6 +144,9 @@ public final class SellService {
     // -------------------------------------------------------------------- selling
 
     public SellResult sellHand(Player player) {
+        if (blockedByMissingPack()) {
+            return SellResult.cropPackMissing(packIntegrity.latest().summary());
+        }
         ConfigSnapshot snapshot = configs.get();
         ItemStack hand = player.getInventory().getItemInMainHand();
         int slot = player.getInventory().getHeldItemSlot();
@@ -148,6 +164,9 @@ public final class SellService {
     }
 
     public SellResult sellInventory(Player player) {
+        if (blockedByMissingPack()) {
+            return SellResult.cropPackMissing(packIntegrity.latest().summary());
+        }
         ConfigSnapshot snapshot = configs.get();
         Collected collected = collect(player, snapshot);
 

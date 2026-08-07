@@ -15,6 +15,7 @@ import dev.lk.gardenshop.gui.SellMenu;
 import dev.lk.gardenshop.item.AdapterItems;
 import dev.lk.gardenshop.item.HarvestResolver;
 import dev.lk.gardenshop.item.ItemTagService;
+import dev.lk.gardenshop.item.PackIntegrity;
 import dev.lk.gardenshop.item.MythicItems;
 import dev.lk.gardenshop.item.WeightStamper;
 import dev.lk.gardenshop.sell.SellLine;
@@ -69,12 +70,14 @@ public final class GardenShopCommand implements CommandExecutor, TabCompleter {
     private final PriceSweep sweep;
     private final MenuContext menuContext;
     private final PackDelivery packDelivery;
+    private final PackIntegrity packIntegrity;
     private final AdapterCommand adapterCommand;
 
     public GardenShopCommand(ConfigService configs, SellService sell, HarvestResolver resolver,
                              ItemTagService tags, EconomyRouter economy, MythicItems mythic,
                              AdapterItems adapter, AdapterBindings bindings,
-                             StatsService stats, Messages messages, PriceSweep sweep,
+                             PackIntegrity packIntegrity, StatsService stats,
+                             Messages messages, PriceSweep sweep,
                              MenuContext menuContext, PackDelivery packDelivery) {
         this.configs = configs;
         this.sell = sell;
@@ -87,6 +90,7 @@ public final class GardenShopCommand implements CommandExecutor, TabCompleter {
         this.sweep = sweep;
         this.menuContext = menuContext;
         this.packDelivery = packDelivery;
+        this.packIntegrity = packIntegrity;
         this.adapterCommand = new AdapterCommand(configs, adapter, bindings, messages, this::applyReload);
     }
 
@@ -139,6 +143,13 @@ public final class GardenShopCommand implements CommandExecutor, TabCompleter {
             // Falling back to help rather than silently doing nothing: the owner turned the
             // menu off, and the commands still work.
             sendHelp(player);
+            return;
+        }
+        if (sell.blockedByMissingPack()) {
+            // Opening it would show a shop whose every button reports nothing to sell. Refusing with
+            // the reason is the only version of this that a player can act on.
+            messages.send(player, "sell.crop-pack-missing",
+                    Placeholder.unparsed("reason", "the server is missing its crop pack"));
             return;
         }
         new SellMenu(menuContext, player).open();
@@ -206,6 +217,8 @@ public final class GardenShopCommand implements CommandExecutor, TabCompleter {
             case INVENTORY_CHANGED -> messages.send(player, "sell.inventory-changed");
             case ON_COOLDOWN -> messages.send(player, "sell.cooldown",
                     Placeholder.unparsed("seconds", result.error()));
+            case CROP_PACK_MISSING -> messages.send(player, "sell.crop-pack-missing",
+                    Placeholder.unparsed("reason", result.error()));
         }
     }
 
@@ -450,6 +463,14 @@ public final class GardenShopCommand implements CommandExecutor, TabCompleter {
             // Re-resolving picks up a changed pack, a new url or a different port. It also
             // forgets who had the old pack, since that art may no longer be what we serve.
             packDelivery.resolve();
+
+            // And re-check the crops themselves: a reload is the other moment a pack can appear,
+            // and without this the gate would stay shut until the next restart.
+            PackIntegrity.Report pack = packIntegrity.verify(snapshot, mythic);
+            if (!pack.satisfied()) {
+                messages.send(sender, "reload.crop-pack",
+                        Placeholder.unparsed("reason", pack.summary()));
+            }
 
             messages.send(sender, "reload.success",
                     Placeholder.unparsed("types", Integer.toString(snapshot.registry().size())),

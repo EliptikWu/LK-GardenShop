@@ -23,6 +23,7 @@ import dev.lk.gardenshop.pack.EmbeddedPackServer;
 import dev.lk.gardenshop.pack.PackBundleInstaller;
 import dev.lk.gardenshop.pack.PackDelivery;
 import dev.lk.gardenshop.item.AdapterItems;
+import dev.lk.gardenshop.item.PackIntegrity;
 import dev.lk.gardenshop.pack.PackTracker;
 import dev.lk.gardenshop.papi.GardenShopExpansion;
 import dev.lk.gardenshop.sell.SellService;
@@ -59,6 +60,7 @@ public final class LKGardenShopPlugin extends JavaPlugin {
     private Messages messages;
     private MenuService menus;
     private PackTracker packs;
+    private PackIntegrity packIntegrity;
     private PackDelivery packDelivery;
 
     @Override
@@ -96,10 +98,15 @@ public final class LKGardenShopPlugin extends JavaPlugin {
         EconomyRouter economy = new EconomyRouter(getServer(), getLogger());
         economy.resolve(configs.snapshot().economy());
 
+        // Verified before the first sale can happen, and re-verified on /gs reload and after a
+        // /mm reload -- see PackIntegrity for why once at enable would be a race.
+        packIntegrity = new PackIntegrity();
+        packIntegrity.verify(configs.snapshot(), mythic);
+
         PriceCalculator calculator = new PriceCalculator();
         PriceSweep sweep = new PriceSweep(calculator);
         SellService sell = new SellService(configs::snapshot, resolver, tags,
-                calculator, economy::provider, stats, getLogger());
+                calculator, economy::provider, stats, packIntegrity, getLogger());
 
         packs = new PackTracker();
         packDelivery = new PackDelivery(this, configs::snapshot,
@@ -112,10 +119,10 @@ public final class LKGardenShopPlugin extends JavaPlugin {
                 menus, configs::snapshot, sell, stats, messages, sweep, mythic, packs, getLogger());
 
         registerCommand(new GardenShopCommand(configs, sell, resolver, tags, economy,
-                mythic, adapter, new AdapterBindings(this),
+                mythic, adapter, new AdapterBindings(this), packIntegrity,
                 stats, messages, sweep, menuContext, packDelivery));
 
-        new MythicEventBridge(this, configs, mythic, stamper).register();
+        new MythicEventBridge(this, configs, mythic, stamper, packIntegrity).register();
         getServer().getPluginManager().registerEvents(new PlayerCleanupListener(sell), this);
         getServer().getPluginManager().registerEvents(new MenuListener(menus, getLogger()), this);
 
@@ -171,8 +178,10 @@ public final class LKGardenShopPlugin extends JavaPlugin {
                 // is true and useless: it tells an owner a number when what they need is the reason
                 // and the fix.
                 entries.add(ConsoleBanner.Entry.off("Crop pack",
-                        "NOT INSTALLED — put growGardenItems.yml in plugins/MythicMobs/Items/ and "
-                                + "restart. Nothing is sellable until you do."));
+                        "NOT INSTALLED — put the crop pack in plugins/MythicMobs/Items/ and restart."
+                                + (snapshot.items().requireCropPack()
+                                        ? " Selling and the shop menu are refused until you do."
+                                        : " Nothing is sellable until you do.")));
             } else {
                 entries.add(ConsoleBanner.Entry.warn("MythicMobs", missing
                         + " of " + snapshot.registry().size()

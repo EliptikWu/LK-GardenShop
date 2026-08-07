@@ -62,6 +62,13 @@ foreach ($e in $entries) {
 
 $dir = Split-Path -Parent $Target
 if (-not (Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
-[System.IO.File]::WriteAllText($Target, $sb.ToString(), (New-Object System.Text.UTF8Encoding($false)))
+
+# LF, not the CRLF that AppendLine produces on Windows.
+#
+# This file is committed, and .gitattributes stores it as LF -- so a CRLF working copy makes
+# the jar built here differ, by exactly this one entry, from the jar anyone else builds from
+# the same commit. That silently breaks the point of publishing a SHA-256.
+$content = $sb.ToString() -replace "`r`n", "`n"
+[System.IO.File]::WriteAllText($Target, $content, (New-Object System.Text.UTF8Encoding($false)))
 
 Write-Output "Wrote $($entries.Count) weight ranges to $Target"

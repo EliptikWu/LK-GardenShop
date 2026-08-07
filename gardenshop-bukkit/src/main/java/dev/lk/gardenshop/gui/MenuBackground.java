@@ -4,6 +4,7 @@ import dev.lk.gardenshop.core.config.GlyphOffset;
 import dev.lk.gardenshop.core.config.MenuLayout;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
 /**
@@ -62,13 +63,21 @@ public final class MenuBackground {
     /**
      * The backdrop glyph on its own, positioned.
      *
-     * <p>Italics are switched off explicitly: the artwork is a glyph like any other, and a slanted
-     * shop front is a surprising way to discover that inventory titles inherit styling.
+     * <h2>White is not a style choice</h2>
+     * Minecraft <b>tints a bitmap glyph by the current text colour</b>, and an inventory title
+     * inherits dark grey ({@code #404040}). Leave the colour unset and the artwork is multiplied by
+     * that: the shop front arrives washed out and muddy, looking for all the world like a badly
+     * exported PNG. Pure white multiplies by one, which is the only way the pack's own colours come
+     * through as drawn.
+     *
+     * <p>Italics are switched off for the same family of reason: the artwork is a glyph like any
+     * other, and a slanted shop front is a surprising way to discover that titles inherit styling.
      */
     private static Component glyph(MenuLayout layout) {
         String positioned = GlyphOffset.of(layout.glyphXOffset()) + layout.glyph();
         return Component.text(positioned)
                 .font(GUI_FONT)
+                .color(NamedTextColor.WHITE)
                 .decoration(TextDecoration.ITALIC, false);
     }
 }

@@ -85,7 +85,10 @@ sell-menu:
 
   slots:
     stats: 4         # lifetime earnings
-    held: 22         # the crop in your hand, appraised
+    # The crop in your hand, appraised. Row 3 rather than row 2: the art's counter sits
+    # lower than the middle of the window, so slot 22 floated on the wooden panel above
+    # it. Slots move in steps of 9 -- one row.
+    held: 31
     sell-hand: 38
     sell-all: 40
     prices: 42       # opens the price book

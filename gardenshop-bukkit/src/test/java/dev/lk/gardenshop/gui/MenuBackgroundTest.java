@@ -7,6 +7,7 @@ import dev.lk.gardenshop.core.config.MenuLayout;
 import dev.lk.gardenshop.util.Text;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -62,6 +63,19 @@ class MenuBackgroundTest {
         assertThat(title.style().font())
                 .as("the glyph is meaningless in any other font")
                 .isEqualTo(Key.key("minecraft", "gui"));
+    }
+
+    @Test
+    @DisplayName("the artwork is white, or the client tints it dark grey")
+    void artworkIsWhite() {
+        Component title = MenuBackground.title(withGlyph(), LABEL, false);
+
+        // Minecraft multiplies a bitmap glyph by the current text colour, and an inventory title
+        // inherits #404040. Without this the shop front renders washed out and muddy -- which looks
+        // like a badly exported PNG, so the pack gets blamed for a bug that lives here.
+        assertThat(title.style().color())
+                .as("an untinted bitmap needs pure white, which multiplies by one")
+                .isEqualTo(NamedTextColor.WHITE);
     }
 
     @Test

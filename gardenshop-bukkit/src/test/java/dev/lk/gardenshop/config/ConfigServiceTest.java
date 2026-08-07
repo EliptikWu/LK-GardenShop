@@ -13,6 +13,10 @@ import org.junit.jupiter.api.Test;
 import org.mockbukkit.mockbukkit.MockBukkit;
 
 import java.io.IOException;
+import dev.lk.gardenshop.core.config.PackMode;
+import dev.lk.gardenshop.core.config.ResourcePackSettings;
+import dev.lk.gardenshop.pack.PackBundleInstaller;
+
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.math.BigDecimal;
@@ -293,6 +297,33 @@ class ConfigServiceTest {
 
         assertThat(configs.loadInitial()).isFalse();
         assertThat(configs.isLoaded()).isFalse();
+    }
+
+    // ------------------------------------------------------------------ shipped pack
+
+    @Test
+    @DisplayName("the shipped url and sha1 describe the pack actually built into this jar")
+    void shippedPackHashMatchesTheBundledPack() throws IOException {
+        configs.loadInitial();
+        ResourcePackSettings pack = configs.snapshot().pack();
+
+        // Filled in, so a fresh install delivers the art with nothing to configure.
+        assertThat(pack.hasUrl()).isTrue();
+        assertThat(pack.hasValidSha1()).isTrue();
+        assertThat(pack.mode())
+                .as("a url present means external-url is auto-picked, so no open port is needed")
+                .isEqualTo(PackMode.EXTERNAL_URL);
+
+        // The drift this catches: someone edits resourcepack/, rebuilds, and the jar now carries
+        // art whose glyph offsets the plugin assumes -- while the published release, and therefore
+        // every player, still has the old pack. Nothing else would notice.
+        try (InputStream bundled = getClass().getClassLoader().getResourceAsStream("pack.zip")) {
+            assertThat(bundled).as("pack.zip should be on the classpath - run ./gradlew packZip").isNotNull();
+            assertThat(pack.sha1())
+                    .as("resource-pack.sha1 in config.yml is stale: publish a new release of "
+                            + "pack.zip and update the url and sha1 to match")
+                    .isEqualTo(PackBundleInstaller.sha1(bundled.readAllBytes()));
+        }
     }
 
     // --------------------------------------------------------------- adapter bindings

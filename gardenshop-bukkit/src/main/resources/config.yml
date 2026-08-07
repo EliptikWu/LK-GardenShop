@@ -141,14 +141,21 @@ resource-pack:
   #
   # It must be a PUBLIC repository. Release assets on a private one need an access
   # token, and a Minecraft client does not send one, so every player would get a 404.
-  url: ''
+  #
+  # Filled in already: this points at the pack this version of the plugin was built
+  # with, so your players get the shop art without you configuring anything. Replace
+  # both this and the sha1 below if you host your own edited pack.
+  url: 'https://github.com/EliptikWu/LK-GardenShop/releases/download/pack-v1/pack.zip'
 
   # 40 hex characters. Run './gradlew packZip' and it prints the right one.
   #
   # Get this wrong and the client downloads the pack, sees the bytes disagree, and
   # rejects it -- which looks to the player like the download simply failed. It is
   # the single most common cause of "the pack won't load".
-  sha1: ''
+  #
+  # This is the hash of the pack at the url above, verified against the bytes GitHub
+  # actually serves. Change one and you must change the other.
+  sha1: '81898efa863388ea9cd5012128d520cad41a0f23'
 
   # --- Used when mode is bundled-self-host ----------------------------------
   self-host:

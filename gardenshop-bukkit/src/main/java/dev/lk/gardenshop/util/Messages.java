@@ -36,8 +36,15 @@ import java.util.logging.Logger;
  */
 public final class Messages {
 
-    /** Shipped in the jar. Any other code needs a file in the plugin folder. */
-    public static final List<String> BUNDLED_LANGUAGES = List.of("es", "en");
+    /**
+     * Shipped in the jar. Any other code needs a file in the plugin folder.
+     *
+     * <p><b>The first entry is the default</b>, used when {@code config.yml} has no {@code language}
+     * key at all. English leads because it is also {@link #FALLBACK_LANGUAGE}: with the two the same,
+     * a server that never touches the setting gets one language throughout instead of Spanish
+     * messages with English holes wherever a translation lags.
+     */
+    public static final List<String> BUNDLED_LANGUAGES = List.of("en", "es");
 
     /** Back-fills missing keys, and the last resort for an unknown language code. */
     public static final String FALLBACK_LANGUAGE = "en";

@@ -13,14 +13,16 @@
 # Language for every player-facing message.
 #
 # Translations ship inside the jar under lang/messages_<code>.yml, so there is no
-# messages.yml in this folder to edit -- that is text, not configuration. Bundled:
-# 'es' and 'en'.
+# messages.yml in this folder to edit -- that is text, not configuration.
+#
+# Bundled: 'en' (default) and 'es'. Set 'es' for Spanish; both are complete, and a
+# test enforces that neither is missing a key the other has.
 #
 # To change the wording or add a language, drop your own file at
 # plugins/LKGardenShop/lang/messages_<code>.yml and it wins over the bundled one.
 # Any code works that way, not only the two shipped. A key missing from a
 # translation falls back to English rather than showing the raw key name.
-language: es
+language: en
 
 economy:
   # AUTO           VaultUnlocked if installed, else classic Vault, else no payouts

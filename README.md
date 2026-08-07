@@ -295,9 +295,12 @@ One more file appears only if you use it. `adapter-bindings.yml` is written by
 `/gs adapter bind` and is the only file this plugin ever writes to itself — see
 [Mapping an item from another plugin](#mapping-an-item-from-another-plugin).
 
-`language: es` ships as the default. A key missing from a translation falls back to English, not
-to the raw key name, so a half-finished translation reads oddly instead of showing players
-`gui.sell-menu.held.name`.
+**English (`language: en`) is the default; `es` is the other bundled language.** Both are complete,
+and a test fails if either gains a key the other lacks.
+
+The default matches the fallback on purpose: a key missing from a translation falls back to English
+rather than showing players `gui.sell-menu.held.name`, so a server that never touches the setting
+reads in one language instead of finding English holes in Spanish text.
 
 A reload is all-or-nothing. If any file has an error, **nothing** is applied: the previous
 settings stay live and the errors are listed back to you with file and path. You cannot

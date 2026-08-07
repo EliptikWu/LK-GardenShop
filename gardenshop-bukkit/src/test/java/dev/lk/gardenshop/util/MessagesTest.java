@@ -56,13 +56,33 @@ class MessagesTest {
     }
 
     @Test
-    @DisplayName("Spanish is the shipped default and really is Spanish")
-    void spanishIsDefault() {
-        assertThat(Messages.BUNDLED_LANGUAGES.getFirst()).isEqualTo("es");
+    @DisplayName("English is the shipped default, and it is the fallback too")
+    void englishIsDefault() {
+        // The list's head is what a config.yml with no 'language' key gets. Keeping it equal to the
+        // fallback means an untouched server reads in one language rather than in two: the previous
+        // default was Spanish, so any key a translation had not caught up with appeared in English
+        // in the middle of Spanish text.
+        assertThat(Messages.BUNDLED_LANGUAGES.getFirst())
+                .isEqualTo("en")
+                .isEqualTo(Messages.FALLBACK_LANGUAGE);
+
+        messages.reload("en");
+        assertThat(messages.plain("no-permission")).containsIgnoringCase("permission");
+    }
+
+    @Test
+    @DisplayName("Spanish is genuinely translated, not a copy of the English file")
+    void spanishIsTranslated() {
+        assertThat(Messages.BUNDLED_LANGUAGES).contains("es");
 
         messages.reload("es");
-        // A sanity check that the file was translated rather than copied.
+        assertThat(messages.language()).isEqualTo("es");
+        // Cheap, but it is the check that catches a file duplicated and never translated -- which
+        // LanguageParityTest cannot see, since a copy has exactly the right keys.
         assertThat(messages.plain("no-permission")).containsIgnoringCase("permiso");
+        assertThat(messages.plain("sell.nothing"))
+                .containsIgnoringCase("cosecha")
+                .doesNotContainIgnoringCase("holding");
     }
 
     @Test

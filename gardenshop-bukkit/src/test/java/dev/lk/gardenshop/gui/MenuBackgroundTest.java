@@ -100,17 +100,25 @@ class MenuBackgroundTest {
     }
 
     @Test
-    @DisplayName("the offset lands the art's drawn slot cells on the window's real ones")
-    void offsetAlignsTheDrawnGrid() {
+    @DisplayName("the measured offset lands the art's drawn cells on the window's real ones")
+    void measuredOffsetAlignsTheDrawnGrid() {
         // Not centring, which is what this used to do -- alignment. The art draws its own cells, so
-        // the only correct offset is the one that puts the first drawn column on the first real
-        // slot. Off by a pixel and every item in the menu sits off-centre in its own cell, which
-        // reads as sloppy art rather than as arithmetic.
-        int canvasLeftEdge = TITLE_X + GuiSettings.GLYPH_X_ALIGNED;
-
-        assertThat(canvasLeftEdge + ART_FIRST_COLUMN)
+        // the arithmetic has exactly one answer: put the first drawn column on the first real slot.
+        assertThat(TITLE_X + GuiSettings.GLYPH_X_MEASURED + ART_FIRST_COLUMN)
                 .as("the art's first drawn column must land on the window's first slot")
                 .isEqualTo(WINDOW_FIRST_SLOT_X);
+    }
+
+    @Test
+    @DisplayName("what ships stays within a pixel or two of the measurement")
+    void shippedOffsetStaysNearTheMeasurement() {
+        // The shipped value is the measurement plus a nudge asked for on screen, so it cannot be
+        // pinned exactly -- but it can be kept honest. This catches a typo or a well-meaning
+        // "improvement" that walks the art off its own grid, which is the failure that looks like
+        // sloppy art rather than like arithmetic.
+        assertThat(GuiSettings.GLYPH_X_ALIGNED)
+                .as("a by-eye nudge, not a redesign")
+                .isBetween(GuiSettings.GLYPH_X_MEASURED - 3, GuiSettings.GLYPH_X_MEASURED + 3);
     }
 
     @Test

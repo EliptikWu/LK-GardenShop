@@ -47,12 +47,15 @@ class GlyphOffsetTest {
     }
 
     @Test
-    @DisplayName("the shop's alignment offset composes to exactly -47 px")
-    void shopAlignmentOffset() {
-        // -47 lands the art's first drawn slot column (x=47 on the canvas) on the window's first
-        // real slot (x=8), from a title cursor that starts at x=8. The composed characters have to
-        // add up to precisely that: a pixel out and every item sits off its own drawn cell.
-        assertThat(widthOf(GlyphOffset.of(GuiSettings.GLYPH_X_ALIGNED))).isEqualTo(-47);
+    @DisplayName("both shop offsets compose back to exactly the pixels they name")
+    void shopOffsetsComposeExactly() {
+        // The composition is the part that must be exact. Whatever number the art is nudged to, the
+        // advance characters written into the title have to add up to precisely it -- a pixel lost
+        // here would move the art without anybody having asked.
+        assertThat(widthOf(GlyphOffset.of(GuiSettings.GLYPH_X_MEASURED)))
+                .isEqualTo(GuiSettings.GLYPH_X_MEASURED);
+        assertThat(widthOf(GlyphOffset.of(GuiSettings.GLYPH_X_ALIGNED)))
+                .isEqualTo(GuiSettings.GLYPH_X_ALIGNED);
     }
 
     @Test

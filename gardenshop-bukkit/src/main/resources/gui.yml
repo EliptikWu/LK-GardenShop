@@ -58,10 +58,10 @@ close-menus-on-reload: true
 # ---------------------------------------------------------------------------
 #  The shop front
 # ---------------------------------------------------------------------------
-#  SIX rows, and that is not arbitrary. The art in shop_gui.png is 222 px tall,
-#  which is the exact height of a 6-row chest window, and the 9x4 grid in its
-#  lower third lines up with the player's three inventory rows plus the hotbar.
-#  Fewer rows and the stand hangs below the window's bottom edge.
+#  SIX rows, and that is not arbitrary. The art draws its own slot cells at an 18px
+#  pitch -- the vanilla one -- and its 9x4 grid at the bottom is the player's three
+#  inventory rows plus the hotbar. Any other row count puts every item off the cell
+#  drawn for it.
 # ---------------------------------------------------------------------------
 sell-menu:
   rows: 6
@@ -73,14 +73,17 @@ sell-menu:
   #   ''     no backdrop at all
   background: shop
 
-  # Horizontal nudge in pixels, and NOT a matter of taste: the art draws its own slot
+  # Horizontal nudge in pixels. The measurement says -47: the art draws its own slot
   # cells at x 47, 65, 83 ... 191 -- an 18px pitch, the vanilla one -- while a window's
-  # slots start at x 8. That is 39px of shift, and the title cursor starts at x=8, so
-  # the nudge is -39 - 8 = -47. Change it and items sit off their drawn cells.
+  # slots start at x 8, and the title cursor starts at x=8, so -39 - 8 = -47.
   #
-  # Its vertical partner is 'ascent: 29' in the pack's font/gui.json. Horizontal moves
-  # need only /gs reload; vertical ones need ./gradlew packZip and a re-download.
-  background-x-offset: -47
+  # It ships at -48, one pixel further left, asked for after seeing it on screen. Stray
+  # much beyond that and items start sitting off the cells drawn for them.
+  #
+  # Its vertical partner is 'ascent: 31' in the pack's font/gui.json -- the measured 29
+  # plus two of the same by-eye kind. Horizontal moves need only /gs reload; vertical
+  # ones need ./gradlew packZip, a new release and a re-download for every player.
+  background-x-offset: -48
 
   # No filler: the backdrop fills the window, and a wall of glass panes would hide
   # the very thing the pack exists to show.
@@ -129,7 +132,7 @@ sell-menu:
 confirm-menu:
   rows: 6
   background: shop
-  background-x-offset: -47
+  background-x-offset: -48
 
   # No filler, for the same reason as the shop: the art is the background.
   filler: ''
@@ -146,8 +149,10 @@ confirm-menu:
 # ---------------------------------------------------------------------------
 #  The price book
 # ---------------------------------------------------------------------------
-#  The bottom row is navigation; everything above it is content. With 6 rows that
-#  leaves 45 content slots, so a crop's 30 drop types fit on one page.
+#  The top row is skipped and the bottom row is navigation, so content gets the 36
+#  slots between them -- a crop's 30 drop types still fit on one page. The top row
+#  is skipped because the backdrop's panel starts below its signage, and drops level
+#  with the sign sit on the woodwork instead of inside the panel.
 # ---------------------------------------------------------------------------
 price-book:
   rows: 6
@@ -156,7 +161,7 @@ price-book:
   # shelves drawn on it, and thirty drop icons laid across shelves they do not line up
   # with reads as a mistake rather than as a shelf.
   background: list
-  background-x-offset: -47
+  background-x-offset: -48
 
   filler: ''
   slots:

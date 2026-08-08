@@ -71,16 +71,25 @@ public record GuiSettings(
     public static final char GLYPH_SHOP_LIST = 0xE902;
 
     /**
-     * Pixels to shift left so the art's drawn slot cells land on the window's real ones.
+     * Where the measurement says the art belongs.
      *
-     * <p>Measured from the art, not guessed: its columns are drawn at x 47, 65, 83 … 191 — an 18px
-     * pitch, the vanilla one — while a window's slots start at x 8. That is 39px of shift, and since
-     * the title's cursor starts at x=8 the nudge is {@code -39 - 8 = -47}.
+     * <p>Its columns are drawn at x 47, 65, 83 … 191 — an 18px pitch, the vanilla one — while a
+     * window's slots start at x 8. That is 39px of shift, and since the title's cursor starts at
+     * x=8 the nudge is {@code -39 - 8 = -47}.
      *
-     * <p>Its vertical partner is {@code ascent: 29} in the pack's {@code font/gui.json}, from the
-     * same measurement. The two have to agree, so both are documented in both places.
+     * <p>Kept separate from {@link #GLYPH_X_ALIGNED} so the arithmetic stays checkable after
+     * somebody nudges the art by eye — which is exactly what happened.
      */
-    public static final int GLYPH_X_ALIGNED = -47;
+    public static final int GLYPH_X_MEASURED = -47;
+
+    /**
+     * What actually ships: the measurement, plus a pixel asked for on screen.
+     *
+     * <p>The vertical partner is {@code ascent: 31} in the pack's {@code font/gui.json}, which is
+     * the measured 29 plus two of the same kind of adjustment. Both are documented in both places
+     * because they have to agree, and neither is guessable from the other.
+     */
+    public static final int GLYPH_X_ALIGNED = GLYPH_X_MEASURED - 1;
 
     public GuiSettings {
         Objects.requireNonNull(style, "style");

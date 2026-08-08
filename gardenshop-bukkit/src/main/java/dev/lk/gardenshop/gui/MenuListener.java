@@ -3,6 +3,7 @@ package dev.lk.gardenshop.gui;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -45,17 +46,30 @@ public final class MenuListener implements Listener {
             return;
         }
 
+        boolean inMenu = event.getClickedInventory() == event.getView().getTopInventory();
+
+        // The player's own inventory stays usable while a menu is open. Cancelling every click was
+        // simpler but it froze their bag: they could not so much as move a crop into their hand
+        // with the shop in front of them.
+        if (!inMenu) {
+            if (!reachesIntoMenu(event)) {
+                // Their items, their business -- but the menu is now describing a bag that has
+                // changed, so re-render it a tick later, once the move has actually happened.
+                refreshLater(menu);
+                return;
+            }
+            // Shift-clicking and double-clicking cross the boundary: one pushes an item into the
+            // menu, the other collects matching stacks out of it. Either would have a player
+            // swapping items with our buttons.
+            event.setCancelled(true);
+            event.setResult(org.bukkit.event.Event.Result.DENY);
+            return;
+        }
+
         event.setCancelled(true);
         // Belt and braces: a plugin running later could set the cursor or the result even on
         // a cancelled event, so blank them too.
         event.setResult(org.bukkit.event.Event.Result.DENY);
-
-        // Clicks in the player's own half are swallowed, not dispatched: they are not
-        // button presses, and treating them as such would fire buttons at raw slot indices
-        // that happen to collide.
-        if (event.getClickedInventory() != event.getView().getTopInventory()) {
-            return;
-        }
 
         try {
             menu.onClick(event);
@@ -67,11 +81,44 @@ public final class MenuListener implements Listener {
         }
     }
 
+    /**
+     * Whether a click in the player's own inventory would still move items across the boundary.
+     *
+     * <p>Two actions do. {@code MOVE_TO_OTHER_INVENTORY} is a shift-click, which pushes the item
+     * into the open menu; {@code COLLECT_TO_CURSOR} is a double-click, which gathers every matching
+     * stack it can find <em>including the menu's own icons</em>. Both would let a player walk off
+     * with a button.
+     */
+    private static boolean reachesIntoMenu(InventoryClickEvent event) {
+        return event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY
+                || event.getAction() == InventoryAction.COLLECT_TO_CURSOR;
+    }
+
+    /**
+     * Re-renders a tick later, after the click has been applied.
+     *
+     * <p>Now that the player's inventory is live, the menu can go stale while it is open: it shows
+     * the crop in their hand and what their bag is worth, and both change the moment they move
+     * something. Rendering immediately would read the inventory as it was before the click.
+     */
+    private void refreshLater(Menu menu) {
+        menus.refreshLater(menu);
+    }
+
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
     public void onDrag(InventoryDragEvent event) {
-        if (menuOf(event.getView().getTopInventory()) != null) {
-            event.setCancelled(true);
+        Menu menu = menuOf(event.getView().getTopInventory());
+        if (menu == null) {
+            return;
         }
+        // Only when the drag actually touches the menu. A drag entirely inside the player's own
+        // inventory is theirs to make.
+        int menuSize = event.getView().getTopInventory().getSize();
+        if (event.getRawSlots().stream().anyMatch(slot -> slot < menuSize)) {
+            event.setCancelled(true);
+            return;
+        }
+        refreshLater(menu);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

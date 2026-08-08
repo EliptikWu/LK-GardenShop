@@ -52,8 +52,18 @@ public final class PriceBookMenu extends Menu {
     }
 
     /** Slots above the navigation row, where content goes. */
+    /**
+     * The first slot content is laid into.
+     *
+     * <p>One row down rather than at the top: the backdrop's panel starts below its signage, and a
+     * row of drops level with the sign sits on the woodwork instead of inside the panel.
+     */
+    private static final int CONTENT_START = MenuLayout.COLUMNS;
+
+    /** How many slots content may use: everything but the skipped top row and the navigation row. */
     private int contentSlots() {
-        return Math.max(MenuLayout.COLUMNS, layout().size() - MenuLayout.COLUMNS);
+        return Math.max(MenuLayout.COLUMNS,
+                layout().size() - CONTENT_START - MenuLayout.COLUMNS);
     }
 
     @Override
@@ -96,7 +106,7 @@ public final class PriceBookMenu extends Menu {
             if (slot >= contentSlots()) {
                 break;
             }
-            set(slot++, icon(plainDropOf(row.species().id()), Material.WHEAT,
+            set(CONTENT_START + slot++, icon(plainDropOf(row.species().id()), Material.WHEAT,
                     context.messages().get("gui.price-book.crop.name",
                             Placeholder.component("crop", Text.legacy(row.species().displayName()))),
                     context.messages().getList("gui.price-book.crop.lore",
@@ -119,7 +129,7 @@ public final class PriceBookMenu extends Menu {
         int from = page * perPage;
         for (int i = 0; i < perPage && from + i < rows.size(); i++) {
             PriceSweep.TypeRow row = rows.get(from + i);
-            set(i, icon(row.mythicType(), materialFor(row),
+            set(CONTENT_START + i, icon(row.mythicType(), materialFor(row),
                     context.messages().get("gui.price-book.type.name",
                             Placeholder.unparsed("variant", row.variant().name()),
                             Placeholder.unparsed("mutations", mutationsOf(row))),
@@ -185,11 +195,13 @@ public final class PriceBookMenu extends Menu {
             return;
         }
 
-        // A content slot on the crop list opens that crop.
-        if (focus == null && slot < contentSlots()) {
+        // A content slot on the crop list opens that crop. The raw slot has to be mapped back
+        // through CONTENT_START, or every click would open the crop one place along.
+        if (focus == null && slot >= CONTENT_START && slot < CONTENT_START + contentSlots()) {
+            int index = slot - CONTENT_START;
             List<Species> species = new ArrayList<>(context.snapshot().species());
-            if (slot < species.size()) {
-                context.menus().openLater(new PriceBookMenu(context, viewer, species.get(slot), 0));
+            if (index < species.size()) {
+                context.menus().openLater(new PriceBookMenu(context, viewer, species.get(index), 0));
             }
         }
     }

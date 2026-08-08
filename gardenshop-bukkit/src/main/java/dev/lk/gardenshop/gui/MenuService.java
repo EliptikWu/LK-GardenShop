@@ -74,6 +74,23 @@ public final class MenuService {
         open.clear();
     }
 
+    /**
+     * Re-renders one menu on the next tick.
+     *
+     * <p>For use from inside an inventory click, where the click has not been applied yet: reading
+     * the inventory now would describe it as it was a moment ago. Skipped if the player has closed
+     * the menu in the meantime.
+     *
+     * <p>Entity scheduler, like {@link #openLater}, so this is correct on Folia too.
+     */
+    public void refreshLater(Menu menu) {
+        menu.viewer().getScheduler().run(plugin, task -> {
+            if (menu.viewer().isOnline() && open.get(menu.viewer().getUniqueId()) == menu) {
+                menu.refresh();
+            }
+        }, null);
+    }
+
     /** Re-renders every open menu, for when the thing they display has changed. */
     public void refreshAll() {
         for (Menu menu : Map.copyOf(open).values()) {

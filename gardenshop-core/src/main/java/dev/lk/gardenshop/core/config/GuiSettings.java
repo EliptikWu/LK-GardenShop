@@ -98,7 +98,7 @@ public record GuiSettings(
                 // sit at art y 88, 106 and 124, and the shelves are drawn at 86-90, 104-108 and
                 // 122-126.
                 new MenuLayout(6, Map.of(
-                        BUTTON_STATS, 4,
+                        BUTTON_STATS, 22,
                         BUTTON_HELD, 31,
                         BUTTON_SELL_HAND, 38,
                         BUTTON_SELL_ALL, 40,

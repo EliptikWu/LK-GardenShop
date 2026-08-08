@@ -128,8 +128,8 @@ class MenuSafetyTest {
     }
 
     @Test
-    @DisplayName("a click in the player's own half is cancelled too, so shift-click cannot reach the menu")
-    void playerInventoryClicksAreCancelled() {
+    @DisplayName("a shift-click in the player's own half is cancelled: it would reach into the menu")
+    void shiftClickIntoTheMenuIsCancelled() {
         PlayerMock player = server.addPlayer();
         ProbeMenu menu = openProbe(player);
         player.getInventory().setItem(0, new ItemStack(Material.DIAMOND, 5));
@@ -143,6 +143,42 @@ class MenuSafetyTest {
         assertThat(event.isCancelled()).isTrue();
         assertThat(menu.clicks)
                 .as("a click in the player's bag is not a button press and must not be dispatched")
+                .isZero();
+    }
+
+    @Test
+    @DisplayName("a double-click in the player's own half is cancelled: it collects the menu's icons")
+    void doubleClickCollectingFromTheMenuIsCancelled() {
+        PlayerMock player = server.addPlayer();
+        openProbe(player);
+
+        // COLLECT_TO_CURSOR gathers every matching stack in the whole view, the menu's own buttons
+        // included, so a player could double-click their way to owning an icon.
+        InventoryClickEvent event = click(player, 30, ClickType.DOUBLE_CLICK,
+                InventoryAction.COLLECT_TO_CURSOR);
+        listener.onClick(event);
+
+        assertThat(event.isCancelled()).isTrue();
+    }
+
+    @Test
+    @DisplayName("an ordinary click in the player's own bag is ALLOWED")
+    void ordinaryPlayerInventoryClicksAreAllowed() {
+        PlayerMock player = server.addPlayer();
+        ProbeMenu menu = openProbe(player);
+        player.getInventory().setItem(0, new ItemStack(Material.DIAMOND, 5));
+
+        // The bug this guards: cancelling every click while a menu was open froze the player's own
+        // inventory. They could not move a crop into their hand with the shop in front of them,
+        // which reads as the plugin having locked up.
+        InventoryClickEvent event = click(player, 30, ClickType.LEFT, InventoryAction.PICKUP_ALL);
+        listener.onClick(event);
+
+        assertThat(event.isCancelled())
+                .as("their items are their business")
+                .isFalse();
+        assertThat(menu.clicks)
+                .as("still not a button press, so nothing is dispatched")
                 .isZero();
     }
 

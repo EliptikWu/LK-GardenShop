@@ -17,9 +17,9 @@
     "  drawn rows     y 156, 174, 192, 214    vanilla player rows 140, 158, 176, 198 -> up 16",
     "",
     "  A glyph's top row lands at baseline - ascent, and a title's baseline is y=13. The measured",
-    "  16 px of lift would be ascent = 13 + 16 = 29; ascent is 32 because three more pixels were",
+    "  16 px of lift would be ascent = 13 + 16 = 29; ascent is 31 because two more pixels were",
     "  asked for once it was on screen, which is the one part of this that is taste and not",
-    "  arithmetic. Raising it further raises the art.",
+    "  arithmetic. A bigger ascent raises the art, a smaller one lowers it.",
     "",
     "  The title cursor starts at x=8, so putting the canvas left edge at x=-39 needs an offset",
     "  of -47, which is background-x-offset in gui.yml.",
@@ -61,7 +61,7 @@
     {
       "type": "bitmap",
       "file": "minecraft:gui/garden_shop_gui.png",
-      "ascent": 32,
+      "ascent": 31,
       "height": 256,
       "chars": [
         "\ue901"
@@ -70,7 +70,7 @@
     {
       "type": "bitmap",
       "file": "minecraft:gui/garden_shop_gui_list.png",
-      "ascent": 32,
+      "ascent": 31,
       "height": 256,
       "chars": [
         "\ue902"

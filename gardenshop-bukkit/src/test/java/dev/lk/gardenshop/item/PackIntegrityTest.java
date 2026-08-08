@@ -27,6 +27,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -137,6 +138,44 @@ class PackIntegrityTest {
         assertThat(complete.satisfied()).isTrue();
         assertThat(complete.packAbsent()).isFalse();
         assertThat(complete.summary()).isEqualTo("all 180 types present in the pack");
+    }
+
+    @Test
+    @DisplayName("a type sharing a plainer sibling's art is marked, the sibling is not")
+    void borrowedArtIsMarked() {
+        // The real shape of the shipped pack: the plain drop, its Nether version and its End version
+        // all carry Model 92139, because only the plain one has been drawn. Two of the three are
+        // wearing someone else's sprite.
+        PackIntegrity.Report report = new PackIntegrity.Report(true, 30, 30, 0,
+                Set.of("growgardenncdropnether", "growgardenncdropend"));
+
+        assertThat(report.hasOwnArt("growGardenNCDrop"))
+                .as("the plain drop is the one the art was drawn for")
+                .isTrue();
+        assertThat(report.hasOwnArt("growGardenNCDropNether")).isFalse();
+        assertThat(report.hasOwnArt("growGardenNCDropEnd")).isFalse();
+
+        // Case-insensitive like every other type comparison here, or the marking would depend on how
+        // the pack author capitalised a name.
+        assertThat(report.hasOwnArt("GROWGARDENNCDROPNETHER")).isFalse();
+    }
+
+    @Test
+    @DisplayName("borrowed art never stops a sale: those drops exist and price correctly")
+    void borrowedArtDoesNotGate() {
+        // Worth pinning. The drop is real and its mutation multiplier applies; the only thing missing
+        // is a picture. Refusing to sell it would turn a cosmetic gap into lost money.
+        PackIntegrity.Report report = new PackIntegrity.Report(true, 30, 30, 0,
+                Set.of("growgardenncdropnether"));
+
+        assertThat(report.satisfied()).isTrue();
+    }
+
+    @Test
+    @DisplayName("nothing is marked when every type has its own art")
+    void nothingBorrowedByDefault() {
+        assertThat(integrity.latest().hasOwnArt("anything")).isTrue();
+        assertThat(integrity.verify(snapshot(true), absentMythic).borrowedArt()).isEmpty();
     }
 
     @Test

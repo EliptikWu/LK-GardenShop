@@ -153,3 +153,9 @@ price-book:
     back: ARROW
     previous-page: SPECTRAL_ARROW
     next-page: SPECTRAL_ARROW
+
+    # Shown instead of the crop for a drop type the pack has drawn nothing for yet.
+    # Detected, not configured: a type wearing a plainer sibling's Model has no art of
+    # its own, so it would otherwise appear as a second price on the same picture. Draw
+    # the art, give it its own Model, and it stops being marked on the next reload.
+    unavailable: BARRIER

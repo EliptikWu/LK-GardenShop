@@ -116,7 +116,8 @@ public final class LKGardenShopPlugin extends JavaPlugin {
 
         menus = new MenuService(this);
         MenuContext menuContext = new MenuContext(
-                menus, configs::snapshot, sell, stats, messages, sweep, mythic, packs, getLogger());
+                menus, configs::snapshot, sell, stats, messages, sweep, mythic, packIntegrity,
+                packs, getLogger());
 
         registerCommand(new GardenShopCommand(configs, sell, resolver, tags, economy,
                 mythic, adapter, new AdapterBindings(this), packIntegrity,

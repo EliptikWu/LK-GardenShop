@@ -214,9 +214,23 @@ public final class PriceBookMenu extends Menu {
      * model numbers to keep in step with the pack.
      */
     private ItemStack icon(String mythicType, Material fallback, Component name, List<Component> lore) {
+        if (!context.hasOwnArt(mythicType)) {
+            // Nothing is drawn for this drop yet: it wears a plainer sibling's sprite, so showing it
+            // would put the same picture next to two different prices and invite the reader to
+            // conclude they are the same plant. A barrier says "not this one" without pretending.
+            List<Component> marked = new ArrayList<>(lore);
+            marked.add(context.messages().get("gui.price-book.type.no-art"));
+            return Icon.of(unavailableIcon(), name, marked);
+        }
         return context.packArt(mythicType)
                 .map(art -> Icon.fromItem(art, name, lore))
                 .orElseGet(() -> Icon.of(fallback, name, lore));
+    }
+
+    /** Configurable, because "unavailable" is a look an owner may want to match to their pack. */
+    private Material unavailableIcon() {
+        return Icon.material(layout().icon(GuiSettings.BUTTON_UNAVAILABLE, "BARRIER").materialFor(false),
+                Material.BARRIER, context.logger());
     }
 
     /**

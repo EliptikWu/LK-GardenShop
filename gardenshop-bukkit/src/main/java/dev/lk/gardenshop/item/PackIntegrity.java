@@ -1,11 +1,20 @@
 package dev.lk.gardenshop.item;
 
 import dev.lk.gardenshop.core.ConfigSnapshot;
+import dev.lk.gardenshop.core.registry.DropDefinition;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 /**
  * Whether MythicMobs actually has the crops this plugin prices.
@@ -42,11 +51,32 @@ public final class PackIntegrity {
      * @param declared     types {@code crops.yml} prices
      * @param present      of those, how many Mythic knows
      * @param withoutModel of the present ones, how many build an item with no CustomModelData
+     * @param borrowedArt  types drawn with a <em>sibling's</em> art rather than their own — see
+     *                     {@link #borrowedArt()}
      */
-    public record Report(boolean mythicHooked, int declared, int present, int withoutModel) {
+    public record Report(boolean mythicHooked, int declared, int present, int withoutModel,
+                         Set<String> borrowedArt) {
+
+        public Report {
+            borrowedArt = Set.copyOf(borrowedArt);
+        }
+
+        /** Without the art analysis, for tests and for the unknown state. */
+        public Report(boolean mythicHooked, int declared, int present, int withoutModel) {
+            this(mythicHooked, declared, present, withoutModel, Set.of());
+        }
 
         public static Report unknown() {
             return new Report(false, 0, 0, 0);
+        }
+
+        /**
+         * Whether this type has art of its own.
+         *
+         * <p>Normalised, because everything else here compares type names case-insensitively.
+         */
+        public boolean hasOwnArt(String mythicType) {
+            return mythicType == null || !borrowedArt.contains(mythicType.toLowerCase(Locale.ROOT));
         }
 
         public int missing() {
@@ -102,32 +132,69 @@ public final class PackIntegrity {
             return store(new Report(false, snapshot.registry().size(), 0, 0));
         }
 
-        Set<String> declared = snapshot.registry().types();
         Set<String> known = mythic.knownTypes().stream()
                 .map(name -> name.toLowerCase(Locale.ROOT))
-                .collect(java.util.stream.Collectors.toUnmodifiableSet());
+                .collect(Collectors.toUnmodifiableSet());
 
         int present = 0;
         int withoutModel = 0;
-        for (String type : declared) {
-            if (!known.contains(type.toLowerCase(Locale.ROOT))) {
+        // Model -> the types drawn with it. One model serving several types means they are visually
+        // indistinguishable, which is what the art analysis below turns into an answer.
+        Map<Integer, List<DropDefinition>> byModel = new LinkedHashMap<>();
+
+        for (DropDefinition drop : snapshot.registry().all()) {
+            if (!known.contains(drop.mythicType().toLowerCase(Locale.ROOT))) {
                 continue;
             }
             present++;
-            if (!hasModel(mythic, type)) {
+            OptionalInt model = modelOf(mythic, drop.mythicType());
+            if (model.isEmpty()) {
                 withoutModel++;
+                continue;
+            }
+            byModel.computeIfAbsent(model.getAsInt(), key -> new ArrayList<>()).add(drop);
+        }
+        return store(new Report(true, snapshot.registry().size(), present, withoutModel,
+                borrowers(byModel)));
+    }
+
+    /**
+     * Of each set of types sharing one model, the ones that are not its owner.
+     *
+     * <p>The owner is the drop with the <b>fewest mutations</b>. That is not a guess about this
+     * particular pack: art gets drawn for the plain crop first and mutated variants are added later,
+     * so a mutated drop wearing the same sprite as a plainer sibling is a placeholder — it exists in
+     * the config and prices correctly, but there is nothing drawn for it yet.
+     *
+     * <p>Deriving it beats a hand-kept list of exceptions: the day the missing art is drawn and given
+     * its own {@code Model}, this set shrinks on the next reload with nothing to update.
+     */
+    private static Set<String> borrowers(Map<Integer, List<DropDefinition>> byModel) {
+        Set<String> borrowed = new LinkedHashSet<>();
+        for (List<DropDefinition> sharing : byModel.values()) {
+            if (sharing.size() < 2) {
+                continue;
+            }
+            DropDefinition owner = sharing.stream()
+                    .min(Comparator.comparingInt(drop -> drop.mutations().size()))
+                    .orElseThrow();
+            for (DropDefinition drop : sharing) {
+                if (drop != owner) {
+                    borrowed.add(drop.mythicType().toLowerCase(Locale.ROOT));
+                }
             }
         }
-        return store(new Report(true, declared.size(), present, withoutModel));
+        return borrowed;
     }
 
     /** Absent art is not a missing item, so a build failure counts as "no model" rather than absent. */
     @SuppressWarnings("deprecation")
-    private static boolean hasModel(MythicItems mythic, String type) {
+    private static OptionalInt modelOf(MythicItems mythic, String type) {
         return mythic.menuItem(type)
                 .map(ItemStack::getItemMeta)
-                .map(meta -> meta != null && meta.hasCustomModelData())
-                .orElse(false);
+                .filter(meta -> meta != null && meta.hasCustomModelData())
+                .map(meta -> OptionalInt.of(meta.getCustomModelData()))
+                .orElse(OptionalInt.empty());
     }
 
     private Report store(Report report) {

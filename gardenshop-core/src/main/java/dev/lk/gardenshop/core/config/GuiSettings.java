@@ -46,6 +46,13 @@ public record GuiSettings(
     public static final String BUTTON_NEXT_PAGE = "next-page";
 
     /**
+     * Not a button: the look of a drop type the pack has drawn nothing for yet.
+     *
+     * <p>Listed with the buttons because it is configured the same way, in {@code price-book.icons}.
+     */
+    public static final String BUTTON_UNAVAILABLE = "unavailable";
+
+    /**
      * Codepoint of the shop backdrop, as declared in the pack's
      * {@code assets/minecraft/font/gui.json}.
      *

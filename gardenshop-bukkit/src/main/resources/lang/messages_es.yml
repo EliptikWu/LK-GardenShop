@@ -295,6 +295,8 @@ gui:
         - ''
         - '<dark_gray><type>'
 
+    no-art: '<dark_gray>  <red>Todavia no hay arte para este.'
+
     back-to-shop: '<yellow>Volver a la tienda'
     back-to-crops: '<yellow>Volver a todos los cultivos'
     previous-page: '<yellow>Pagina <page> de <pages>'

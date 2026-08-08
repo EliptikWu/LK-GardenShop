@@ -4,6 +4,7 @@ import dev.lk.gardenshop.core.ConfigSnapshot;
 import dev.lk.gardenshop.core.pricing.PriceSweep;
 import dev.lk.gardenshop.economy.EconomyProvider;
 import dev.lk.gardenshop.item.MythicItems;
+import dev.lk.gardenshop.item.PackIntegrity;
 import dev.lk.gardenshop.pack.PackTracker;
 import dev.lk.gardenshop.sell.SellLine;
 import dev.lk.gardenshop.sell.SellService;
@@ -34,6 +35,7 @@ public record MenuContext(
         Messages messages,
         PriceSweep sweep,
         MythicItems mythic,
+        PackIntegrity packIntegrity,
         PackTracker packs,
         Logger logger
 ) {
@@ -68,6 +70,17 @@ public record MenuContext(
      */
     public Optional<ItemStack> packArt(String mythicType) {
         return snapshot().pack().installed() ? mythic.menuItem(mythicType) : Optional.empty();
+    }
+
+    /**
+     * Whether this drop type has art of its own, or is wearing a plainer sibling's.
+     *
+     * <p>A type with no art drawn yet is indistinguishable from the one it borrows from, so showing
+     * it as that crop invites the reader to conclude two different prices belong to the same plant.
+     * Marked instead — see {@link dev.lk.gardenshop.item.PackIntegrity#borrowers}.
+     */
+    public boolean hasOwnArt(String mythicType) {
+        return packIntegrity.latest().hasOwnArt(mythicType);
     }
 
     /** What a bulk sale of this player's bag would come to. */

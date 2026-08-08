@@ -289,6 +289,8 @@ gui:
         - ''
         - '<dark_gray><type>'
 
+    no-art: '<dark_gray>  <red>No art drawn for this one yet.'
+
     back-to-shop: '<yellow>Back to the shop'
     back-to-crops: '<yellow>Back to all crops'
     previous-page: '<yellow>Page <page> of <pages>'

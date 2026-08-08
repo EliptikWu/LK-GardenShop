@@ -47,10 +47,12 @@ class GlyphOffsetTest {
     }
 
     @Test
-    @DisplayName("the centring offset the shop uses is exactly -48 px")
-    void shopCentringOffset() {
-        // -48 puts a 256-wide canvas's left edge at (176-256)/2 = -40, from a cursor at x=8.
-        assertThat(widthOf(GlyphOffset.of(GuiSettings.GLYPH_X_CENTRED_256))).isEqualTo(-48);
+    @DisplayName("the shop's alignment offset composes to exactly -47 px")
+    void shopAlignmentOffset() {
+        // -47 lands the art's first drawn slot column (x=47 on the canvas) on the window's first
+        // real slot (x=8), from a title cursor that starts at x=8. The composed characters have to
+        // add up to precisely that: a pixel out and every item sits off its own drawn cell.
+        assertThat(widthOf(GlyphOffset.of(GuiSettings.GLYPH_X_ALIGNED))).isEqualTo(-47);
     }
 
     @Test

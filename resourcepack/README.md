@@ -23,25 +23,54 @@ mod and no NMS.
 | Provider | What it gives us |
 |---|---|
 | `space` | `U+E9B0`–`U+E9BF` mapped to advances of ±1, 2, 4 … 128 px. Any pixel offset is a short combination of these, so the plugin can position the art horizontally. |
-| `bitmap` | `U+E901` → `gui/shop_gui.png`, with `ascent` for the vertical position and `height` for the scale. |
+| `bitmap` | `U+E901` → `gui/garden_shop_gui.png` and `U+E902` → `gui/garden_shop_gui_list.png`, with `ascent` for the vertical position and `height` for the scale. |
 
 `MenuBackground` in the plugin composes the offset characters and the glyph into the title.
 
-### Why `ascent: 13` and `height: 256`
+### Why `ascent: 29` and `height: 256`
 
-`shop_gui.png` is a 256×256 canvas whose art occupies **x 25..230, y 0..221** — 206×222 px.
+Both backdrops are a 256x256 canvas whose art occupies **x 2..253, y 0..238**.
 
-222 is the exact height of a **6-row chest window**, and the grid in the lower third of the art is
-9×4, which is the player's three inventory rows plus the hotbar. The texture was drawn to cover the
-whole window, so:
+The scale is 1:1, and that is measured rather than chosen. The art draws its own slot cells, and
+those cells are **18 px apart** — the vanilla pitch. Scale the glyph at all and every item sits
+off-centre in the cell drawn for it, which reads as bad art rather than as bad arithmetic.
 
-- `height: 256` renders it 1:1, making the art 222 px tall — the window's exact height.
-- `ascent: 13` puts its top row at the window's top edge. The title is drawn at y=6 and the vanilla
-  font's ascent is 7, so the baseline is at y=13; a glyph's top row lands at `baseline - ascent`.
-- The art is 206 wide against a 176-wide window, so the stand overhangs ~15 px each side by design.
-  `menu.background.x-offset: -48` in `config.yml` centres the canvas.
+With the scale fixed, both offsets fall out of two measurements:
 
-This is why the sell menu is **6 rows**: fewer rows and the art would hang below the window.
+| | drawn in the art | where the window puts it | shift |
+|---|---|---|---|
+| columns | x 47, 65, 83 … 191 | slots start at x 8 | 39 px left |
+| rows | y 156, 174, 192, 214 | player rows at 140, 158, 176, 198 | 16 px up |
+
+- A glyph's top row lands at `baseline - ascent`, and a title's baseline is y=13. Putting the canvas
+  top at y=-16 needs `ascent = 13 + 16 = 29`.
+- The title cursor starts at x=8, so putting the canvas left edge at x=-39 needs
+  `background-x-offset: -47` in `gui.yml`.
+
+The awning therefore overhangs the window by 16 px above, and the stand by ~37 px at each side. That
+is how it was drawn: the window's bottom edge lands exactly on the art's.
+
+This is why every menu is **6 rows**. The drawn grid is a 6-row chest's, so any other row count puts
+the whole art in the wrong place.
+
+### The icons, and why they are name tags
+
+Four 16x16 textures in `textures/item/gardenshop/`, reached by CustomModelData:
+
+| CustomModelData | texture | button |
+|---|---|---|
+| 74001 | `sell_select` | sell the held stack |
+| 74002 | `sell_all` | sell everything |
+| 74003 | `prices_book` | open the price book |
+| 74004 | `user_info` | lifetime earnings |
+
+They hang off `models/item/name_tag.json` and **not** `paper.json`, which matters: every item in the
+crop pack is built on paper, so that pack ships its own `models/item/paper.json` with 144 overrides.
+Two resource packs cannot both own one file — whichever loaded last would win and either the crops or
+these icons would vanish. Name tags are nobody else's.
+
+Each icon still declares a `fallback-material` in `gui.yml`, which is what a player without the pack
+sees. A bare name tag would tell them nothing.
 
 ---
 
@@ -79,16 +108,18 @@ PNGs are binary, so drop them in yourself and the wiring is code-side.
 
 | Kind | Where it goes | Size |
 |---|---|---|
-| Another menu backdrop | `assets/minecraft/textures/gui/<name>.png` | match the window: 176×222 art for 6 rows, 176×168 for 3 |
-| A button icon | `assets/minecraft/textures/item/<name>.png` | usually 16×16 |
+| Another menu backdrop | `textures/gui/<name>.png` | draw the slot cells at an 18px pitch, then measure |
+| A button icon | `textures/item/gardenshop/<name>.png` | 16×16 |
 
-**A new backdrop** needs a `bitmap` provider added to `gui.json` with the next free codepoint
-(`U+E902`, `U+E903`, …) and its `ascent` computed as above, then the menu pointed at it.
+**A new backdrop** needs a `bitmap` provider in `gui.json` on the next free codepoint (`U+E903`, …),
+a constant in `GuiSettings`, a name in the loader's backdrop lookup, and its `ascent` worked out the
+way the table above does it — from where the art draws its cells, not by eye.
 
-**A button icon** needs a model in `assets/minecraft/models/item/custom/<name>.json`, an override on
-the base item's model keyed by `custom_model_data`, and the number written into that button's
-`model-data` in the bundled `gui.yml`. Every icon also keeps a `fallback-material`, which is the
-vanilla look used when the pack is off.
+**A button icon** needs a model at `models/item/gardenshop/<name>.json`, one more entry in
+`models/item/name_tag.json`'s `overrides`, and that CustomModelData number written into the button's
+`model-data` in `gui.yml`. Keep giving each one a `fallback-material`.
+
+Do not move the icons onto `paper` for convenience. See above.
 
 ---
 

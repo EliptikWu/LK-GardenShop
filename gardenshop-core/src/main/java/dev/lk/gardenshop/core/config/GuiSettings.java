@@ -63,12 +63,24 @@ public record GuiSettings(
     public static final char GLYPH_SHOP = 0xE901;
 
     /**
-     * Pixels to shift left before drawing a 256-wide glyph so it centres on the 176-wide window.
+     * The same stand with its panel left empty, for the price book.
      *
-     * <p>The title's cursor starts at x=8, and centring a 256px canvas wants its left edge at
-     * {@code (176-256)/2 = -40}, so the nudge is {@code -40 - 8 = -48}.
+     * <p>A separate drawing rather than the same one: the sell menu's panel has three shelves drawn
+     * on it, and thirty drop icons laid over shelves they do not line up with reads as a mistake.
      */
-    public static final int GLYPH_X_CENTRED_256 = -48;
+    public static final char GLYPH_SHOP_LIST = 0xE902;
+
+    /**
+     * Pixels to shift left so the art's drawn slot cells land on the window's real ones.
+     *
+     * <p>Measured from the art, not guessed: its columns are drawn at x 47, 65, 83 … 191 — an 18px
+     * pitch, the vanilla one — while a window's slots start at x 8. That is 39px of shift, and since
+     * the title's cursor starts at x=8 the nudge is {@code -39 - 8 = -47}.
+     *
+     * <p>Its vertical partner is {@code ascent: 29} in the pack's {@code font/gui.json}, from the
+     * same measurement. The two have to agree, so both are documented in both places.
+     */
+    public static final int GLYPH_X_ALIGNED = -47;
 
     public GuiSettings {
         Objects.requireNonNull(style, "style");
@@ -79,27 +91,33 @@ public record GuiSettings(
 
     public static GuiSettings defaults() {
         return new GuiSettings(true, MenuStyle.STYLED, true, true,
-                // Six rows because the art is 222px tall, which is the exact height of a 6-row
-                // chest window. Fewer rows and the stand would hang below the window's edge.
+                // Six rows, and not by preference: the art's drawn slot grid is a vanilla 6-row
+                // chest's, so any other row count puts every item off its own drawn cell.
+                //
+                // The button rows land on the three shelves drawn in the panel -- rows 4, 5 and 6
+                // sit at art y 88, 106 and 124, and the shelves are drawn at 86-90, 104-108 and
+                // 122-126.
                 new MenuLayout(6, Map.of(
                         BUTTON_STATS, 4,
-                        BUTTON_HELD, 22,
+                        BUTTON_HELD, 31,
                         BUTTON_SELL_HAND, 38,
                         BUTTON_SELL_ALL, 40,
                         BUTTON_PRICES, 42),
                         // No filler: the backdrop art fills the window, and a wall of glass panes
                         // would hide the very thing the pack exists to show.
-                        Map.of(), "", GLYPH_SHOP, GLYPH_X_CENTRED_256),
-                new MenuLayout(3, Map.of(
-                        BUTTON_CONFIRM, 11,
-                        BUTTON_SUMMARY, 13,
-                        BUTTON_CANCEL, 15),
-                        Map.of(), "GRAY_STAINED_GLASS_PANE", MenuLayout.NO_GLYPH, 0),
+                        Map.of(), "", GLYPH_SHOP, GLYPH_X_ALIGNED),
+                // The confirmation screen wears the same stand, so it needs the same six rows for
+                // the drawn grid to line up. Its three buttons go on the middle shelf.
+                new MenuLayout(6, Map.of(
+                        BUTTON_CONFIRM, 38,
+                        BUTTON_SUMMARY, 40,
+                        BUTTON_CANCEL, 42),
+                        Map.of(), "", GLYPH_SHOP, GLYPH_X_ALIGNED),
                 new MenuLayout(6, Map.of(
                         BUTTON_BACK, 49,
                         BUTTON_PREVIOUS_PAGE, 45,
                         BUTTON_NEXT_PAGE, 53),
-                        Map.of(), "", MenuLayout.NO_GLYPH, 0));
+                        Map.of(), "", GLYPH_SHOP_LIST, GLYPH_X_ALIGNED));
     }
 
     /** Convenience for a plain vanilla icon spec, used by the loader's defaults. */

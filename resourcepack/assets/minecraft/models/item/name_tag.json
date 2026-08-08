@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "minecraft:item/name_tag"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "custom_model_data": 74001
+      },
+      "model": "minecraft:item/gardenshop/sell_select"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 74002
+      },
+      "model": "minecraft:item/gardenshop/sell_all"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 74003
+      },
+      "model": "minecraft:item/gardenshop/prices_book"
+    },
+    {
+      "predicate": {
+        "custom_model_data": 74004
+      },
+      "model": "minecraft:item/gardenshop/user_info"
+    }
+  ]
+}

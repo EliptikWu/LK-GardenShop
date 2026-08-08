@@ -176,18 +176,21 @@ class ConfigServiceTest {
         assertThat(gui.priceBook().rows()).isEqualTo(6);
         assertThat(gui.sellMenu().slot(GuiSettings.BUTTON_SELL_ALL)).contains(40);
 
-        // Six rows is load-bearing, not a preference: the backdrop art is 222px tall, which is
-        // exactly a 6-row chest window. Any other row count and the stand does not line up.
-        assertThat(gui.sellMenu().rows())
-                .as("the sell menu must match the height shop_gui.png was drawn for")
-                .isEqualTo(6);
-        assertThat(gui.sellMenu().hasGlyph())
-                .as("the sell menu is the one screen with backdrop art")
-                .isTrue();
-        assertThat(gui.sellMenu().glyphXOffset()).isEqualTo(GuiSettings.GLYPH_X_CENTRED_256);
-        assertThat(gui.confirmMenu().hasGlyph())
-                .as("no art for the 3-row confirmation screen yet")
-                .isFalse();
+        // Six rows everywhere is load-bearing, not a preference: the backdrop draws its own slot
+        // cells at the vanilla 18px pitch, so any other row count leaves every item off the cell
+        // drawn for it.
+        for (MenuLayout layout : List.of(gui.sellMenu(), gui.confirmMenu(), gui.priceBook())) {
+            assertThat(layout.rows())
+                    .as("every screen wearing the stand must be the height it was drawn for")
+                    .isEqualTo(6);
+            assertThat(layout.hasGlyph()).as("all three screens carry backdrop art").isTrue();
+            assertThat(layout.glyphXOffset()).isEqualTo(GuiSettings.GLYPH_X_ALIGNED);
+        }
+        // Two drawings, and the difference matters: the sell menu's panel has shelves on it, the
+        // price book's is empty because thirty drop icons go there.
+        assertThat(gui.sellMenu().glyph()).isEqualTo(GuiSettings.GLYPH_SHOP);
+        assertThat(gui.confirmMenu().glyph()).isEqualTo(GuiSettings.GLYPH_SHOP);
+        assertThat(gui.priceBook().glyph()).isEqualTo(GuiSettings.GLYPH_SHOP_LIST);
 
         // Every declared button must land inside its own menu, or it silently vanishes.
         for (MenuLayout layout : List.of(gui.sellMenu(), gui.confirmMenu(), gui.priceBook())) {
@@ -204,8 +207,8 @@ class ConfigServiceTest {
         // gui.yml is not extracted, so staging a copy here is exactly what an admin who wants to
         // rearrange the menu would do.
         copyBundled("gui.yml");
-        // Slot 40 does not exist in the 3-row confirmation menu.
-        replaceIn("gui.yml", "    confirm: 11", "    confirm: 40");
+        // Slot 99 does not exist in any menu.
+        replaceIn("gui.yml", "    confirm: 38", "    confirm: 99");
         ConfigService.ReloadOutcome outcome = configs.reload();
 
         assertThat(outcome.applied()).isFalse();

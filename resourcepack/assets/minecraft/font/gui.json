@@ -3,17 +3,34 @@
     "Menu art drawn as glyphs in the inventory TITLE. A title glyph renders behind the items and",
     "in front of the container background, which is exactly the layer a menu backdrop needs.",
     "",
-    "U+E901  shop_gui.png. Canvas 256x256; the art occupies x 25..230, y 0..221 (206x222).",
-    "        222 is the exact height of a 6-row chest window, so at height:256 (scale 1:1) the art",
-    "        covers the whole window. ascent:13 puts its top row at the window's top edge: the title",
-    "        baseline sits at y=13 (drawn at y=6, vanilla ascent 7), and a glyph's top row lands at",
-    "        baseline - ascent.",
+    "U+E901  garden_shop_gui.png       the sell menu: three drawn shelves in the panel",
+    "U+E902  garden_shop_gui_list.png  the price book: the same stand with the panel left empty",
+    "",
+    "Both are a 256x256 canvas whose art occupies x 2..253, y 0..238, and both render 1:1 at",
+    "height:256. That the scale is 1:1 is measured, not assumed: the slot cells drawn in the art",
+    "are 18 px apart, the vanilla pitch, so any scaling would put items off-centre in the very",
+    "cells drawn for them.",
+    "",
+    "ascent:29, and background-x-offset:-47 in gui.yml, come from that same measurement:",
+    "",
+    "  drawn columns  x 47, 65, 83 ... 191    vanilla slots start at x 8    -> shift left 39",
+    "  drawn rows     y 156, 174, 192, 214    vanilla player rows 140, 158, 176, 198 -> up 16",
+    "",
+    "  A glyph's top row lands at baseline - ascent and the title baseline is y=13, so putting",
+    "  the canvas top at y=-16 needs ascent = 13 + 16 = 29. The title cursor starts at x=8, so",
+    "  putting the canvas left edge at x=-39 needs an offset of -47.",
+    "",
+    "The awning therefore overhangs the window by 16 px above and the stand by ~37 px each side,",
+    "which is how it was drawn: the window's bottom edge lands exactly on the art's.",
     "",
     "U+E9B0..U+E9B7  positive advances  +1 +2 +4 +8 +16 +32 +64 +128",
     "U+E9B8..U+E9BF  negative advances  -1 -2 -4 -8 -16 -32 -64 -128",
     "        Binary building blocks: any pixel offset is a short combination of these. The plugin",
-    "        composes them in MenuBackground so the X position is tunable from config.yml without",
+    "        composes them in MenuBackground, so the X position is tunable from gui.yml without",
     "        touching this file.",
+    "",
+    "Escapes, not literal characters: a private-use codepoint written raw is invisible in every",
+    "editor and does not survive an encoding round-trip.",
     "",
     "To move the art vertically or rescale it, change ascent/height below, then run",
     "  ./gradlew packZip",
@@ -43,11 +60,20 @@
     },
     {
       "type": "bitmap",
-      "file": "minecraft:gui/shop_gui.png",
-      "ascent": 13,
+      "file": "minecraft:gui/garden_shop_gui.png",
+      "ascent": 29,
       "height": 256,
       "chars": [
         "\ue901"
+      ]
+    },
+    {
+      "type": "bitmap",
+      "file": "minecraft:gui/garden_shop_gui_list.png",
+      "ascent": 29,
+      "height": 256,
+      "chars": [
+        "\ue902"
       ]
     }
   ]

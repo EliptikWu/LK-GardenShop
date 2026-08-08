@@ -295,10 +295,12 @@ public final class YamlConfigLoader {
                 glyph = MenuLayout.NO_GLYPH;
             } else if ("shop".equalsIgnoreCase(named)) {
                 glyph = GuiSettings.GLYPH_SHOP;
+            } else if ("shop-list".equalsIgnoreCase(named) || "list".equalsIgnoreCase(named)) {
+                glyph = GuiSettings.GLYPH_SHOP_LIST;
             } else {
                 report.error(GUI_FILE, path + ".background", "'" + named
-                        + "' is not a known backdrop. Use 'shop', or leave it empty for none."
-                        + " Adding one means a new bitmap provider in the pack's font/gui.json.");
+                        + "' is not a known backdrop. Use 'shop' or 'list', or leave it empty for"
+                        + " none. Adding one means a new bitmap provider in the pack's font/gui.json.");
             }
         }
         int glyphXOffset = section.getInt("background-x-offset", fallback.glyphXOffset());

@@ -34,15 +34,21 @@ class MenuBackgroundTest {
      * The advance of the shop glyph.
      *
      * <p>Minecraft measures a bitmap glyph from its <em>content</em>, not its canvas:
-     * {@code advance = (rightmostOpaqueColumn + 1) * scale + 1}. The art in {@code shop_gui.png}
-     * reaches column 230 and renders 1:1, so 232.
+     * {@code advance = (rightmostOpaqueColumn + 1) * scale + 1}. The art in
+     * {@code garden_shop_gui.png} reaches column 253 and renders 1:1, so 255.
      */
-    private static final int GLYPH_ADVANCE = 232;
+    private static final int GLYPH_ADVANCE = 255;
+
+    /** The x of the first column of slot cells drawn in the art. */
+    private static final int ART_FIRST_COLUMN = 47;
+
+    /** Where a window's first slot actually is, from vanilla's slot layout. */
+    private static final int WINDOW_FIRST_SLOT_X = 8;
 
     private static MenuLayout withGlyph() {
         return new MenuLayout(6, Map.of(GuiSettings.BUTTON_SELL_ALL, 40),
                 Map.<String, IconSpec>of(), "", GuiSettings.GLYPH_SHOP,
-                GuiSettings.GLYPH_X_CENTRED_256);
+                GuiSettings.GLYPH_X_ALIGNED);
     }
 
     private static MenuLayout withoutGlyph() {
@@ -84,7 +90,7 @@ class MenuBackgroundTest {
         // The bug this guards: a bitmap glyph advances the cursor by its own width. Appending the
         // label puts it at TITLE_X + offset + advance, which is past the window's right edge, so
         // the title silently vanished while the art looked fine.
-        int labelStart = TITLE_X + GuiSettings.GLYPH_X_CENTRED_256 + GLYPH_ADVANCE;
+        int labelStart = TITLE_X + GuiSettings.GLYPH_X_ALIGNED + GLYPH_ADVANCE;
         assertThat(labelStart)
                 .as("if this were inside the window, appending the label would be safe")
                 .isGreaterThan(WINDOW_WIDTH);
@@ -94,10 +100,17 @@ class MenuBackgroundTest {
     }
 
     @Test
-    @DisplayName("the offset centres the 256-wide canvas on the window")
-    void offsetCentresTheCanvas() {
-        // -48 puts the canvas's left edge at (176-256)/2 = -40 from a cursor at x=8.
-        assertThat(TITLE_X + GuiSettings.GLYPH_X_CENTRED_256).isEqualTo((WINDOW_WIDTH - 256) / 2);
+    @DisplayName("the offset lands the art's drawn slot cells on the window's real ones")
+    void offsetAlignsTheDrawnGrid() {
+        // Not centring, which is what this used to do -- alignment. The art draws its own cells, so
+        // the only correct offset is the one that puts the first drawn column on the first real
+        // slot. Off by a pixel and every item in the menu sits off-centre in its own cell, which
+        // reads as sloppy art rather than as arithmetic.
+        int canvasLeftEdge = TITLE_X + GuiSettings.GLYPH_X_ALIGNED;
+
+        assertThat(canvasLeftEdge + ART_FIRST_COLUMN)
+                .as("the art's first drawn column must land on the window's first slot")
+                .isEqualTo(WINDOW_FIRST_SLOT_X);
     }
 
     @Test

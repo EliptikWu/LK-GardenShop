@@ -66,18 +66,21 @@ close-menus-on-reload: true
 sell-menu:
   rows: 6
 
-  # Which backdrop from the pack's font to draw. 'shop' is shop_gui.png; blank
-  # or anything unrecognised means no backdrop.
+  # Which backdrop from the pack's font to draw.
+  #
+  #   shop   garden_shop_gui.png       the stand, with three shelves drawn in the panel
+  #   list   garden_shop_gui_list.png  the same stand, panel left empty for a grid of drops
+  #   ''     no backdrop at all
   background: shop
 
-  # Horizontal nudge in pixels. -48 centres the 256-wide canvas on the 176-wide
-  # window: the title cursor starts at x=8 and centring wants the left edge at
-  # (176-256)/2 = -40.
+  # Horizontal nudge in pixels, and NOT a matter of taste: the art draws its own slot
+  # cells at x 47, 65, 83 ... 191 -- an 18px pitch, the vanilla one -- while a window's
+  # slots start at x 8. That is 39px of shift, and the title cursor starts at x=8, so
+  # the nudge is -39 - 8 = -47. Change it and items sit off their drawn cells.
   #
-  # Change this and /gs reload -- it needs no pack rebuild. Vertical position and
-  # scale live in the pack's font/gui.json (ascent and height) and DO need
-  # ./gradlew packZip afterwards.
-  background-x-offset: -48
+  # Its vertical partner is 'ascent: 29' in the pack's font/gui.json. Horizontal moves
+  # need only /gs reload; vertical ones need ./gradlew packZip and a re-download.
+  background-x-offset: -47
 
   # No filler: the backdrop fills the window, and a wall of glass panes would hide
   # the very thing the pack exists to show.
@@ -95,40 +98,46 @@ sell-menu:
 
   # Per-button look. Two forms are accepted:
   #
-  #   sell-all: CHEST                                    just a vanilla material
-  #   sell-all: { material: PAPER, model-data: 74002, fallback-material: CHEST }
+  #   sell-all: CHEST                                       just a vanilla material
+  #   sell-all: { material: NAME_TAG, model-data: 74002, fallback-material: CHEST }
   #
-  # 'model-data' is a CustomModelData the resource pack redirects to your own
-  # texture. 'fallback-material' is what a player WITHOUT the pack sees, which is
-  # why every custom icon should have one -- a bare PAPER with no pack looks like
-  # a blank sheet.
+  # 'model-data' is a CustomModelData the pack redirects to our own texture.
+  # 'fallback-material' is what a player WITHOUT the pack sees, which is why every
+  # custom icon needs one -- a bare NAME_TAG with no pack is just a name tag.
   #
-  # No icon textures ship yet, so these are all plain vanilla materials. See
-  # resourcepack/README.md for how to add one.
+  # Why NAME_TAG and not PAPER: every item in the crop pack is built on paper, so that
+  # pack ships its own models/item/paper.json with 144 overrides. Two resource packs
+  # cannot both own one file -- one would replace the other and either the crops or
+  # these icons would break. Name tags are nobody else's.
   icons:
-    sell-hand: GOLD_INGOT
-    sell-all: CHEST
-    prices: BOOK
-    stats: GOLDEN_HOE
+    sell-hand: { material: NAME_TAG, model-data: 74001, fallback-material: GOLD_INGOT }
+    sell-all:  { material: NAME_TAG, model-data: 74002, fallback-material: CHEST }
+    prices:    { material: NAME_TAG, model-data: 74003, fallback-material: BOOK }
+    stats:     { material: NAME_TAG, model-data: 74004, fallback-material: GOLDEN_HOE }
+
+    # Not one of ours: it stands in for the crop you are NOT holding, so it should read
+    # as an empty slot rather than as a button.
     held: BARRIER
 
 
 # ---------------------------------------------------------------------------
 #  "Are you sure" before a bulk sale
 # ---------------------------------------------------------------------------
-#  No backdrop art for this one yet: shop_gui.png is drawn for a 6-row window and
-#  this screen is 3 rows. It keeps the vanilla chest look until there is art for
-#  it, at which point add a bitmap provider to the pack's font/gui.json and name
-#  it here.
+#  Wears the same stand as the shop, so it needs the same SIX rows: the backdrop
+#  draws its own slot grid at a fixed pitch, and a 3-row window would leave every
+#  drawn cell in the wrong place. The three buttons go on the middle shelf.
 # ---------------------------------------------------------------------------
 confirm-menu:
-  rows: 3
-  background: ''
-  filler: GRAY_STAINED_GLASS_PANE
+  rows: 6
+  background: shop
+  background-x-offset: -47
+
+  # No filler, for the same reason as the shop: the art is the background.
+  filler: ''
   slots:
-    confirm: 11
-    summary: 13
-    cancel: 15
+    confirm: 38
+    summary: 40
+    cancel: 42
   icons:
     confirm: LIME_CONCRETE
     summary: PAPER
@@ -143,7 +152,13 @@ confirm-menu:
 # ---------------------------------------------------------------------------
 price-book:
   rows: 6
-  background: ''
+
+  # 'list' is the stand with its panel left empty. The sell menu's version has three
+  # shelves drawn on it, and thirty drop icons laid across shelves they do not line up
+  # with reads as a mistake rather than as a shelf.
+  background: list
+  background-x-offset: -47
+
   filler: ''
   slots:
     previous-page: 45

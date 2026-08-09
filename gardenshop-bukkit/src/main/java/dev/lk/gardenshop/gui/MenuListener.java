@@ -16,15 +16,18 @@ import java.util.logging.Logger;
 
 /**
  * Routes inventory events to whichever {@link Menu} is open, and — more importantly —
- * makes sure nothing can be moved while one is.
+ * makes sure nothing can be moved into or out of one.
  *
- * <h2>Why every click is cancelled, including clicks in the player's own inventory</h2>
- * A click that lands in the player's half of the view can still reach the menu: shift-click
- * moves a stack up into it, a number-key press swaps a hotbar slot with a menu slot, and a
- * drag can span both halves. Cancelling only the clicks whose raw slot falls inside the menu
- * leaves all of those open. Cancelling the entire view is one line, needs no case analysis,
- * and costs the player nothing but the ability to rearrange their bag for the few seconds a
- * menu is open.
+ * <h2>Where the line is drawn</h2>
+ * Every click and drag inside the menu is cancelled outright. No slot in it holds a real item, so
+ * there is nothing a click there could legitimately do beyond press a button.
+ *
+ * <p>The player's own half stays live. Cancelling the whole view was one line and needed no case
+ * analysis, but it froze their bag — with the shop open they could not so much as move a crop into
+ * their hand. What replaced it is the case analysis: two actions cross the boundary from below and
+ * are refused, shift-click pushing a stack up into the menu and double-click collecting matching
+ * stacks out of it. A drag is refused as soon as one of its slots falls inside the menu, and
+ * anything allowed below schedules a re-render, since the menu describes a bag that just changed.
  *
  * <p>Cancellation happens <em>before</em> the menu's handler runs, so a handler that throws
  * cannot leave a live, uncancelled inventory click behind.

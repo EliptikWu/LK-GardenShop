@@ -7,9 +7,13 @@ through Vault.
 Built for a MythicMobs + MythicCrucible crop pack that grows six crops in three variants across ten
 mutation states — 180 harvest items in all.
 
-**You bring the crops.** The pack this was built for is not published here — it is the content the
-shop sells, not the shop. The plugin never opens a pack file: it reads whatever crops MythicMobs has
-loaded, so `crops.yml` takes the tokens of *your* pack, and the shipped one is an example to adapt.
+**The crops are sold separately.** This is the till, not the produce. The plugin never opens a pack
+file — it reads whatever crops MythicMobs has loaded — and the pack it is built and priced for is
+**[From Seed to Sky: Ultimate Farming Expansion](https://mcmodels.net/products/16939/from-seed-to-sky-ultimate-farming-expansion)**,
+which you buy there. Nothing of it is redistributed here. Install it and the shop has 180 harvest
+types to sell; install nothing and the shop still starts, tells you so in one line, and sells
+nothing. A different Crucible pack works too: `crops.yml` takes the tokens of *your* pack, and the
+shipped one is tuned for the above.
 
 **Support:** [Discord](https://discord.com/invite/ZfCC7amBu7)
 
@@ -47,12 +51,14 @@ wording in `messages.yml`, and both reload with `/gs reload`.
 - **Price book** — one icon per crop, click through to all 30 of its drop types with the price
   at its lightest and heaviest. The same figures `/gs prices` prints.
 
-**No menu ever holds a real item.** Every slot is a display icon, and every click and drag in
-the view is cancelled unconditionally — including clicks in the player's own half, because
-shift-click, number-key swap and drag-distribute all reach the menu from there. A
-"drop your crops in here" chest would feel more tactile and would introduce a family of
-item-loss bugs on close, crash and reload; showing crops as icons and selling from the real
-inventory gets the same feel with none of that. Eight tests in `MenuSafetyTest` hold that line.
+**No menu ever holds a real item.** Every slot is a display icon, and every click and drag inside
+the menu is cancelled. Your own inventory stays usable with the shop open — all except the two
+actions that reach across the boundary, shift-click and double-click-collect, which would have a
+player walking off with a button; anything you are allowed to do down there re-renders the menu,
+because it is describing the bag you just changed. A "drop your crops in here" chest would feel more
+tactile and would introduce a family of item-loss bugs on close, crash and reload; showing crops as
+icons and selling from the real inventory gets the same feel with none of that. Ten tests in
+`MenuSafetyTest` hold that line.
 
 Menus are closed on `/gs reload` (the prices they display have just been replaced) and on
 plugin disable (a menu whose listener is gone is an unguarded inventory).
@@ -137,10 +143,11 @@ number — no code.
 |---|---|
 | Server | Paper 1.21.3 or newer |
 | Java | 21 |
-| Required | MythicMobs 5 + MythicCrucible (for the crops themselves) |
+| Required | MythicMobs 5 + MythicCrucible (they run the crops) |
+| The crops | **[From Seed to Sky: Ultimate Farming Expansion](https://mcmodels.net/products/16939/from-seed-to-sky-ultimate-farming-expansion)** — bought separately; the pack this ships priced for. Any Crucible pack works once `crops.yml` names its tokens |
 | For payouts | Vault **or** VaultUnlocked, plus any economy plugin — EssentialsX, CMI, CoinsEngine, ExcellentEconomy… |
 | Optional | PlaceholderAPI |
-| Bundled | [ItemBridge](https://github.com/LK/LK-ItemBridge), shaded in — nothing to install |
+| Bundled | [ItemBridge](https://github.com/EliptikWu/LK-ItemBridge), shaded in — nothing to install |
 
 Nothing but a broken config file stops the plugin from starting. No MythicMobs and items
 are identified from the plugin's own tags. No Vault and the server still boots, prices can
@@ -150,7 +157,7 @@ No PlaceholderAPI and there are simply no placeholders.
 ### Crops from other item plugins
 
 Two things bridge to the plugins a server actually runs. **Vault** does it for economies, so a
-payout reaches whatever the server pays in; **[ItemBridge](https://github.com/LK/LK-ItemBridge)**
+payout reaches whatever the server pays in; **[ItemBridge](https://github.com/EliptikWu/LK-ItemBridge)**
 does it for item identity, giving every custom item an id of the form `plugin:id` across MythicMobs,
 Crucible, ItemsAdder, Nexo, Oraxen and CraftEngine.
 
@@ -225,27 +232,46 @@ Then, from the project root:
 ```powershell
 .\gradlew pluginJar                   # builds, prints the file to install and its SHA-256
 .\gradlew packZip                     # rebuilds the resource pack and prints its SHA-1
-.\gradlew build                       # compiles both modules and runs all 243 tests
+.\gradlew build                       # compiles both modules and runs all 260 tests
 .\gradlew test -PshowTestOutput       # also prints the full 180-row calibration sheet
 ```
 
+One of the 260 skips on a fresh clone, and says why when it does: it checks the composed type names
+against the names actually declared in the pack, so it needs `scripts/gen-expected-types.ps1` run
+against your copy of the pack first. Everything else runs without one.
+
 ### Installing
 
-Copy `gardenshop-bukkit\build\libs\LKGardenShop-1.0.0.jar` into `plugins/` — run
-`.\gradlew pluginJar` if you would rather not remember the path. It is the **only** jar to copy;
-`gardenshop-core` and ItemBridge are bundled inside it and must not be installed separately.
+Take `LKGardenShop-1.0.0.jar` from
+[Releases](https://github.com/EliptikWu/LK-GardenShop/releases) and drop it in `plugins/`, or build
+your own with `.\gradlew pluginJar`, which prints the path so you do not have to remember it. Either
+way that is the **only** jar to copy; `gardenshop-core` and ItemBridge are bundled inside it and must
+not be installed separately.
 
-**Then give MythicMobs some crops to sell.** The pack is not shipped with the plugin, so a fresh
-install has 180 configured harvest types and MythicMobs knows none of them. The plugin starts anyway
-and says so in one line, rather than leaving you to work it out from an empty shop:
+**Checking what you downloaded.** Every release carries a `.sha256` next to the jar, and the build is
+reproducible: timestamps are zeroed and entry order is fixed, so the same commit built with the same
+JDK 21 yields a byte-identical jar. A clone of this tag therefore reproduces the published hash —
+which is the point of publishing it.
+
+```powershell
+Get-FileHash .\LKGardenShop-1.0.0.jar -Algorithm SHA256
+```
+
+**Then give MythicMobs some crops to sell.** The pack is bought separately, so a fresh install has
+180 configured harvest types and MythicMobs knows none of them. The plugin starts anyway and says so
+in one line, rather than leaving you to work it out from an empty shop:
 
 ```
-Crop pack   NOT INSTALLED — put growGardenItems.yml in plugins/MythicMobs/Items/ and
-            restart. Nothing is sellable until you do.
+Crop pack   NOT INSTALLED — the crops are a separate purchase, From Seed to Sky. Put its
+            items in plugins/MythicMobs/Items/ and restart, or point crops.yml at the
+            tokens of the pack you do have. Selling and the shop menu are refused until
+            you do. Get it at https://mcmodels.net/products/16939/...
 ```
 
-Point `crops.yml` at your own pack's tokens and that row turns green. The three config files are
-written on first run.
+Buy [From Seed to Sky](https://mcmodels.net/products/16939/from-seed-to-sky-ultimate-farming-expansion),
+put its items file in `plugins/MythicMobs/Items/`, restart, and that row turns green — the shipped
+`crops.yml` already names its six crops. Using a different pack instead: point `crops.yml` at its
+tokens. Either way the three config files are written on first run.
 
 Compiled against Paper **1.21.3**, so it runs on 1.21.3 and every later 1.21.x.
 
@@ -430,7 +456,8 @@ that is the cleaner fix and `weights.yml` can then be regenerated to match.
 
 ## Adding a crop
 
-1. Add the plant and its 30 drop items to `growGardenItems.yml`.
+1. Add the plant and its 30 drop items to your pack's Mythic items file — `growGardenItems.yml`
+   in From Seed to Sky.
 2. Add one entry to `crops.yml` — token, display name, base value, reference weight, and
    the plain drop's weight range.
 3. Run `scripts/gen-weights.ps1`.

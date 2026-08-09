@@ -4,8 +4,8 @@
 # — then fix crops.yml until the test passes again.
 
 param(
-    [string]$Source = "c:\LK-GardenShop\growGardenItems.yml",
-    [string]$Target = "c:\LK-GardenShop\gardenshop-core\src\test\resources\expected-drop-types.txt"
+    [string]$Source = (Join-Path $PSScriptRoot "..\growGardenItems.yml"),
+    [string]$Target = (Join-Path $PSScriptRoot "..\gardenshop-core\src\test\resources\expected-drop-types.txt")
 )
 
 $names = Get-Content -LiteralPath $Source -Encoding UTF8 |

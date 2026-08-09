@@ -1,4 +1,7 @@
-# Generates weights.yml from growGardenItems.yml.
+# Generates weights.yml from the crop pack's Mythic items file.
+#
+# -Source defaults to growGardenItems.yml beside this repo's root, which is where the
+# From Seed to Sky pack's items file lands. Another pack: pass -Source yourself.
 #
 # The pack encodes each drop's weight as a lore line:
 #     - "§r&f&lWeight: &r1.<random.05to40>kg"
@@ -7,8 +10,8 @@
 # 2-decimal fraction it was written as, which recovers the intended range.
 
 param(
-    [string]$Source = "c:\LK-GardenShop\growGardenItems.yml",
-    [string]$Target = "c:\LK-GardenShop\gardenshop-bukkit\src\main\resources\weights.yml"
+    [string]$Source = (Join-Path $PSScriptRoot "..\growGardenItems.yml"),
+    [string]$Target = (Join-Path $PSScriptRoot "..\gardenshop-bukkit\src\main\resources\weights.yml")
 )
 
 $lines = Get-Content -LiteralPath $Source -Encoding UTF8

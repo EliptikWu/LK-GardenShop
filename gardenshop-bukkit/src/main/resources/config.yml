@@ -49,6 +49,18 @@ economy:
   currency: ''
 
 items:
+  # WHERE THE CROPS COME FROM
+  #
+  # This plugin is the shop, not the produce. The crops it prices are a MythicCrucible
+  # pack bought separately -- From Seed to Sky: Ultimate Farming Expansion, at
+  # https://mcmodels.net/products/16939/from-seed-to-sky-ultimate-farming-expansion
+  # -- and the shipped crops.yml is already written for its six crops. Put the pack's
+  # items in plugins/MythicMobs/Items/ and restart.
+  #
+  # Running a different Crucible pack instead is supported: crops.yml takes whatever
+  # tokens your pack uses. Nothing here reads a pack file; the plugin only ever asks
+  # MythicMobs what it has loaded.
+
   # Refuse to sell, and refuse to open the shop, while MythicMobs does not have the
   # crops this plugin prices.
   #

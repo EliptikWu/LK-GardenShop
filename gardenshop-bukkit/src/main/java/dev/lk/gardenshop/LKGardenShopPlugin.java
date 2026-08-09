@@ -55,6 +55,16 @@ public final class LKGardenShopPlugin extends JavaPlugin {
 
     private static final String COMMAND_NAME = "gardenshop";
 
+    /**
+     * Where the crops come from, printed on the banner when the server has none.
+     *
+     * <p>Worth the width. That line appears on a fresh install with nothing to sell, and the fix is
+     * a pack bought elsewhere — not something an owner can work out from an empty shop. Written in
+     * full because the short {@code /products/16939} form of this URL answers 404.
+     */
+    private static final String CROP_PACK_URL =
+            "https://mcmodels.net/products/16939/from-seed-to-sky-ultimate-farming-expansion";
+
     private ConfigService configs;
     private StatsService stats;
     private Messages messages;
@@ -179,10 +189,15 @@ public final class LKGardenShopPlugin extends JavaPlugin {
                 // is true and useless: it tells an owner a number when what they need is the reason
                 // and the fix.
                 entries.add(ConsoleBanner.Entry.off("Crop pack",
-                        "NOT INSTALLED — put the crop pack in plugins/MythicMobs/Items/ and restart."
+                        "NOT INSTALLED — the crops are a separate purchase, From Seed to Sky. Put"
+                                + " its items in plugins/MythicMobs/Items/ and restart, or point"
+                                + " crops.yml at the tokens of the pack you do have."
                                 + (snapshot.items().requireCropPack()
                                         ? " Selling and the shop menu are refused until you do."
-                                        : " Nothing is sellable until you do.")));
+                                        : " Nothing is sellable until you do.")
+                                // URL last and with nothing after it: a trailing period gets
+                                // swallowed into the link by terminals that linkify.
+                                + " Get it at " + CROP_PACK_URL));
             } else {
                 entries.add(ConsoleBanner.Entry.warn("MythicMobs", missing
                         + " of " + snapshot.registry().size()

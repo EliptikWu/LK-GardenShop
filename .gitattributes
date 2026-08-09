@@ -6,6 +6,11 @@
 gradlew text eol=lf
 gradlew.bat text eol=crlf
 
+# The readme that ships in the zip. CRLF because it is read in Notepad on a Windows server
+# box more often than anywhere else, and the repo default of LF would check it out as one
+# long line there. Kept a rule rather than a habit, so it does not depend on who zipped it.
+dist/README.txt text eol=crlf
+
 # The resource pack's art and the packaged zip must never be line-ending converted.
 *.jar binary
 *.png binary

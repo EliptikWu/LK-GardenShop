@@ -5,7 +5,6 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -137,12 +136,4 @@ public final class PackBundleInstaller {
     // itself, so nothing called it any more and it was deleted rather than left as code whose only
     // remaining user was its own test.
 
-    /** Convenience for callers that already have a file. */
-    public static String sha1Of(File file) {
-        try {
-            return sha1(Files.readAllBytes(file.toPath()));
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
 }

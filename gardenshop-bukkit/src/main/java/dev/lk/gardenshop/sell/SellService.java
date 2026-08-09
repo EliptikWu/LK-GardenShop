@@ -9,7 +9,6 @@ import dev.lk.gardenshop.item.HarvestResolver;
 import dev.lk.gardenshop.item.ItemTagService;
 import dev.lk.gardenshop.item.PackIntegrity;
 import dev.lk.gardenshop.stats.StatsService;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -391,11 +390,4 @@ public final class SellService {
         lastSale.remove(uuid);
     }
 
-    /**
-     * Guard for callers that could plausibly run off-thread. Inventory access and Vault
-     * deposits both require the main thread.
-     */
-    public boolean onMainThread() {
-        return Bukkit.isPrimaryThread();
-    }
 }

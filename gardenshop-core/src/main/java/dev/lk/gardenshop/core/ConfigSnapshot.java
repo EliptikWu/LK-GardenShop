@@ -1,6 +1,5 @@
 package dev.lk.gardenshop.core;
 
-import dev.lk.gardenshop.core.config.EconomyPreference;
 import dev.lk.gardenshop.core.config.EconomySettings;
 import dev.lk.gardenshop.core.config.GuiSettings;
 import dev.lk.gardenshop.core.config.ItemSettings;
@@ -67,10 +66,6 @@ public record ConfigSnapshot(
 
     public Collection<Species> species() {
         return registry.species();
-    }
-
-    public boolean sellingEnabled() {
-        return economy.preference() != EconomyPreference.NONE && !registry.isEmpty();
     }
 
     /**

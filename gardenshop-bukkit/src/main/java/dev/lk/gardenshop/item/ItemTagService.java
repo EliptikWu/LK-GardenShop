@@ -1,14 +1,12 @@
 package dev.lk.gardenshop.item;
 
 import dev.lk.gardenshop.core.domain.Mutation;
-import dev.lk.gardenshop.core.domain.Variant;
 import dev.lk.gardenshop.core.registry.DropDefinition;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.EnumSet;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Set;
@@ -89,28 +87,6 @@ public final class ItemTagService {
             container.set(keys.variant(), PersistentDataType.STRING, definition.variant().name());
             container.set(keys.mutations(), PersistentDataType.STRING, joinMutations(definition.mutations()));
         });
-    }
-
-    /** Overwrites just the weight, leaving identity and favorite state alone. */
-    public void writeWeight(ItemStack item, double weightKg) {
-        item.editMeta(meta -> meta.getPersistentDataContainer()
-                .set(keys.weightKg(), PersistentDataType.DOUBLE, weightKg));
-    }
-
-    public Optional<Variant> readVariant(ItemStack item) {
-        return readString(item, keys.variant()).flatMap(Variant::byId);
-    }
-
-    public Set<Mutation> readMutations(ItemStack item) {
-        Optional<String> raw = readString(item, keys.mutations());
-        if (raw.isEmpty() || raw.get().isBlank()) {
-            return EnumSet.noneOf(Mutation.class);
-        }
-        EnumSet<Mutation> mutations = EnumSet.noneOf(Mutation.class);
-        for (String token : raw.get().split(",")) {
-            Mutation.byId(token).ifPresent(mutations::add);
-        }
-        return mutations;
     }
 
     private static String joinMutations(Set<Mutation> mutations) {

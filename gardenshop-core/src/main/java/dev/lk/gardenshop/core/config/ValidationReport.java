@@ -53,10 +53,6 @@ public record ValidationReport(List<Issue> issues) {
         return issues.stream().anyMatch(issue -> issue.severity() == Severity.ERROR);
     }
 
-    public boolean isClean() {
-        return issues.isEmpty();
-    }
-
     public List<Issue> errors() {
         return issues.stream().filter(issue -> issue.severity() == Severity.ERROR).toList();
     }

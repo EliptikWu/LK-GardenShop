@@ -67,14 +67,29 @@ layer a backdrop needs, and it takes no client mod and no NMS.
 ```
 resourcepack/
   pack.mcmeta
-  assets/minecraft/font/gui.json              negative-space advances + the backdrop glyph
-  assets/minecraft/textures/gui/shop_gui.png  the stand
+  assets/minecraft/font/gui.json                    negative-space advances + two backdrops
+  assets/minecraft/textures/gui/garden_shop_gui.png       the stand, shelves drawn in the panel
+  assets/minecraft/textures/gui/garden_shop_gui_list.png  the same, panel left empty
+  assets/minecraft/textures/item/gardenshop/              four 16×16 button icons
+  assets/minecraft/models/item/name_tag.json              CustomModelData 74001-74004
 ```
 
-`shop_gui.png` is a 256×256 canvas whose art is **206×222**. That 222 is not a coincidence: it is
-the exact height of a 6-row chest window, and the 9×4 grid in the lower third lines up with the
-player's three inventory rows plus the hotbar. So the sell menu is 6 rows, the glyph renders 1:1
-(`height: 256`) and `ascent: 13` puts its top row at the window's top edge.
+Both backdrops are a 256×256 canvas whose art is **252×239**, and they render 1:1 — which is not a
+preference. The art draws its own slot cells, and those cells are **18 px apart**, the vanilla pitch;
+scale the glyph at all and every item sits off-centre in the cell drawn for it. Everything else falls
+out of measuring where the art puts its grid against where a window puts its slots:
+
+```
+drawn columns  x 47, 65, 83 ... 191    window slots start at x 8         -> 39 px left
+drawn rows     y 156, 174, 192, 214    player rows 140, 158, 176, 198    -> 16 px up
+```
+
+So `ascent: 31` and `background-x-offset: -48` — the measured 29 and −47, each with a pixel or two
+asked for on screen. Which is also why **every menu is 6 rows**: the drawn grid is a 6-row chest's.
+
+The icons hang off `name_tag.json` rather than `paper.json`, and that matters: every item in the crop
+pack is built on paper, so that pack owns `paper.json` with 144 overrides of its own. Two packs cannot
+both own one file.
 
 ```powershell
 .\gradlew packZip     # zips the pack, prints its SHA-1, embeds it in the plugin jar

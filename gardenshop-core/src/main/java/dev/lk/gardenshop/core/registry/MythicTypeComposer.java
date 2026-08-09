@@ -56,10 +56,6 @@ public final class MythicTypeComposer {
         return new MythicTypeComposer(DEFAULT_PATTERN);
     }
 
-    public String pattern() {
-        return pattern;
-    }
-
     /**
      * Renders the canonical Mythic internal name for one combination.
      *

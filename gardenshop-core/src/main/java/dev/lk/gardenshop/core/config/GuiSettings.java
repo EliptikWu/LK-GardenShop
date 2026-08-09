@@ -2,7 +2,6 @@ package dev.lk.gardenshop.core.config;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.OptionalInt;
 
 /**
  * Every menu's layout and how they are drawn, from the bundled {@code gui.yml}.
@@ -129,8 +128,4 @@ public record GuiSettings(
                         Map.of(), "", GLYPH_SHOP_LIST, GLYPH_X_ALIGNED));
     }
 
-    /** Convenience for a plain vanilla icon spec, used by the loader's defaults. */
-    public static IconSpec vanilla(String material) {
-        return new IconSpec(material, OptionalInt.empty(), "");
-    }
 }

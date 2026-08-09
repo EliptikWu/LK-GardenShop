@@ -242,7 +242,7 @@ against your copy of the pack first. Everything else runs without one.
 
 ### Installing
 
-Take `LKGardenShop-1.0.0.jar` from
+Take `LKGardenShop-1.0.1.jar` from
 [Releases](https://github.com/EliptikWu/LK-GardenShop/releases) and drop it in `plugins/`, or build
 your own with `.\gradlew pluginJar`, which prints the path so you do not have to remember it. Either
 way that is the **only** jar to copy; `gardenshop-core` and ItemBridge are bundled inside it and must
@@ -254,7 +254,7 @@ JDK 21 yields a byte-identical jar. A clone of this tag therefore reproduces the
 which is the point of publishing it.
 
 ```powershell
-Get-FileHash .\LKGardenShop-1.0.0.jar -Algorithm SHA256
+Get-FileHash .\LKGardenShop-1.0.1.jar -Algorithm SHA256
 ```
 
 **Then give MythicMobs some crops to sell.** The pack is bought separately, so a fresh install has
@@ -284,7 +284,7 @@ separately in [`gradle/libs.versions.toml`](gradle/libs.versions.toml); bumping 
 means bumping `paper-test` to whatever version its error message names.
 
 The root project deliberately has no `java` plugin. With it applied, Gradle produced an
-empty `build/libs/LK-GardenShop-1.0.0.jar` — one hyphen away from the real plugin jar — and
+empty `build/libs/LK-GardenShop-<version>.jar` — one hyphen away from the real plugin jar — and
 installing that decoy fails with *"does not contain a paper-plugin.yml or plugin.yml"*.
 No java plugin means no jar task means the trap cannot come back.
 

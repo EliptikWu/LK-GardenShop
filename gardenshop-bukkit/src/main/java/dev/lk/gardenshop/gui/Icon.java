@@ -54,7 +54,11 @@ public final class Icon {
      */
     public static ItemStack of(IconSpec spec, boolean plain, Logger logger,
                                Component name, List<Component> lore) {
-        Material material = material(spec.materialFor(plain), Material.PAPER, logger);
+        // BARRIER as the last resort, not PAPER. This fires when gui.yml names a material that does
+        // not exist or names none at all, which is a misconfiguration -- and a barrier looks like
+        // one, next to a logged warning. Paper looked deliberate, and worse, wears a crop sprite on
+        // any server running the crop pack, since that pack owns models/item/paper.json.
+        Material material = material(spec.materialFor(plain), Material.BARRIER, logger);
         ItemStack icon = of(material, name, lore);
 
         OptionalInt modelData = spec.modelDataFor(plain);

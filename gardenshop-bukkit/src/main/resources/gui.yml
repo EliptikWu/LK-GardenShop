@@ -140,9 +140,17 @@ confirm-menu:
     confirm: 38
     summary: 40
     cancel: 42
+  # The middle one reuses 74004, the info placard from the sell menu's stats button. Same
+  # meaning in both places -- "here is what you are looking at" -- and reusing it means no
+  # new art, so no pack release and no re-download for anyone.
+  #
+  # It used to be PAPER, which was a mistake for the reason written out above: the crop pack
+  # owns models/item/paper.json, so a plain sheet of paper on a server running that pack
+  # wears one of ITS sprites. That is what a textured button in the middle of this screen
+  # was. Nothing here should be paper.
   icons:
     confirm: LIME_CONCRETE
-    summary: PAPER
+    summary:   { material: NAME_TAG, model-data: 74004, fallback-material: OAK_SIGN }
     cancel: RED_CONCRETE
 
 

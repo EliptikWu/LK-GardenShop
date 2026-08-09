@@ -200,6 +200,28 @@ class ConfigServiceTest {
     }
 
     @Test
+    @DisplayName("no button is built on paper, because the crop pack owns paper's model")
+    void noIconIsBuiltOnPaper() {
+        configs.loadInitial();
+        var gui = configs.snapshot().gui();
+
+        // Every item in the crop pack is Id: paper, so that pack ships its own
+        // models/item/paper.json and a plain sheet of paper is drawn as one of its crops. A button
+        // built on paper therefore wears a crop sprite on exactly the servers this plugin is for --
+        // which is how the confirm screen's middle button came to be textured. Both looks have to be
+        // clear of it: a player without OUR pack may still have the crop one, so the plain fallback
+        // is no safer than the styled material.
+        for (MenuLayout layout : List.of(gui.sellMenu(), gui.confirmMenu(), gui.priceBook())) {
+            layout.icons().forEach((button, spec) -> {
+                assertThat(spec.materialFor(false)).as("%s, styled", button)
+                        .isNotEqualToIgnoringCase("PAPER");
+                assertThat(spec.materialFor(true)).as("%s, plain fallback", button)
+                        .isNotEqualToIgnoringCase("PAPER");
+            });
+        }
+    }
+
+    @Test
     @DisplayName("a button placed outside its menu is an error, not a button that quietly disappears")
     void outOfRangeSlotIsRejected() {
         configs.loadInitial();

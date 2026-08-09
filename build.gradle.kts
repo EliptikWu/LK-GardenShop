@@ -2,9 +2,9 @@ import java.security.MessageDigest
 
 // The root project deliberately does NOT apply the java plugin.
 //
-// It has no sources, so applying it produced an empty `build/libs/LK-GardenShop-1.0.0.jar`
+// It has no sources, so applying it produced an empty `build/libs/LK-GardenShop-<version>.jar`
 // whose name differs from the real plugin jar
-// (`gardenshop-bukkit/build/libs/LKGardenShop-1.0.0.jar`) by a single hyphen. Dropping
+// (`gardenshop-bukkit/build/libs/LKGardenShop-<version>.jar`) by a single hyphen. Dropping
 // that decoy into a server gets you:
 //
 //     does not contain a paper-plugin.yml or plugin.yml!
@@ -13,7 +13,7 @@ import java.security.MessageDigest
 
 allprojects {
     group = "dev.lk"
-    version = "1.0.0"
+    version = "1.0.1"
 }
 
 subprojects {
@@ -57,7 +57,7 @@ subprojects {
  * tampered re-upload — obfuscation does nothing there, since whoever repackages a jar never
  * needed to read it.
  *
- * Written in `sha256sum` format so `sha256sum -c LKGardenShop-1.0.0.jar.sha256` just works.
+ * Written in `sha256sum` format so `sha256sum -c LKGardenShop-<version>.jar.sha256` just works.
  */
 tasks.register("pluginJar") {
     group = "build"

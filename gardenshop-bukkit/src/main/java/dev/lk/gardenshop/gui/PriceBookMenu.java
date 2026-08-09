@@ -260,12 +260,19 @@ public final class PriceBookMenu extends Menu {
                 .orElse("");
     }
 
-    /** Gold and Rainbow drops get their own stand-in so a page is readable without the pack. */
+    /**
+     * Gold and Rainbow drops get their own stand-in so a page is readable without the pack.
+     *
+     * <p>The plain one is wheat rather than the paper these items are really built on. Paper would
+     * be the honest answer and the wrong picture: the crop pack owns {@code models/item/paper.json},
+     * so on a server running it a plain sheet of paper is drawn as one of its crops — a specific,
+     * wrong crop, right next to a price.
+     */
     private static Material materialFor(PriceSweep.TypeRow row) {
         return switch (row.variant()) {
             case GOLD -> Material.GOLD_NUGGET;
             case RAINBOW -> Material.AMETHYST_SHARD;
-            case NORMAL -> Material.PAPER;
+            case NORMAL -> Material.WHEAT;
         };
     }
 

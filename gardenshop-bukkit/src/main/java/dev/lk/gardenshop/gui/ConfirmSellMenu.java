@@ -71,7 +71,10 @@ public final class ConfirmSellMenu extends Menu {
         MenuLayout layout = layout();
         EconomyProvider economy = context.economy();
 
-        layout.slot(GuiSettings.BUTTON_SUMMARY).ifPresent(slot -> set(slot, button(layout, GuiSettings.BUTTON_SUMMARY, "PAPER",
+        // Not PAPER: the crop pack owns models/item/paper.json, so plain paper wears one of its
+        // crop sprites on any server running it. A sign is nobody else's and matches the art
+        // gui.yml points this button at.
+        layout.slot(GuiSettings.BUTTON_SUMMARY).ifPresent(slot -> set(slot, button(layout, GuiSettings.BUTTON_SUMMARY, "OAK_SIGN",
                 context.messages().get("gui.confirm-menu.summary.name"),
                 context.messages().getList("gui.confirm-menu.summary.lore",
                         Placeholder.unparsed("total", economy.format(quotedTotal)),

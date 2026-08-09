@@ -133,7 +133,11 @@ number — no code.
 | `lkgardenshop.admin.reload` | op |
 | `lkgardenshop.admin.info` | op |
 | `lkgardenshop.admin.prices` | op |
-| `lkgardenshop.admin` | op — implies all three admin nodes |
+| `lkgardenshop.admin.adapter` | op |
+| `lkgardenshop.admin` | op — implies the four admin nodes |
+
+`admin.prices` covers both `/gs prices` and the price-book button inside the menu, so on
+the defaults the price sheet is op-only. Grant it to everyone if players should browse it.
 
 ---
 

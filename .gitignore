@@ -20,6 +20,11 @@ run/
 growGardenItems.yml
 gardenshop-core/src/test/resources/expected-drop-types.txt
 
+# The packaged zip that goes out to servers. Built from the jar and dist/README.txt,
+# both of which ARE tracked, so there is no reason to keep a copy of them zipped up
+# in git as well.
+dist/*.zip
+
 # Editor and tooling state, personal to whoever cloned this.
 .claude/
 .vscode/
